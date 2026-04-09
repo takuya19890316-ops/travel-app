@@ -23,6 +23,7 @@
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:linear-gradient(135deg,#f5f7ff 0%,#fef9ff 100%);color:var(--gray-700);min-height:100vh;}
 
+    /* ヘッダー */
     .app-header{background:linear-gradient(135deg,var(--primary) 0%,#7c6bff 100%);color:white;padding:16px 20px;box-shadow:var(--shadow-md);}
     .app-header-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:12px;}
     .back-btn{background:rgba(255,255,255,0.22);border:1.5px solid rgba(255,255,255,0.4);border-radius:var(--radius-sm);color:white;padding:6px 12px;font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:background 0.2s;font-family:inherit;}
@@ -30,120 +31,1286 @@
     .header-title-block{flex:1;}
     .app-header h1{font-size:1.4rem;font-weight:700;letter-spacing:0.02em;}
     .app-header .subtitle{font-size:0.82rem;opacity:0.85;margin-top:2px;}
-    .header-actions{display:flex;gap:8px;}
-    .header-actions button{padding:6px 14px;background:rgba(255,255,255,0.22);border:1.5px solid rgba(255,255,255,0.4);color:white;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;cursor:pointer;transition:background 0.2s;font-family:inherit;}
-    .header-actions button:hover{background:rgba(255,255,255,0.32);}
+    .trip-name-input{background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.4);border-radius:var(--radius-sm);color:white;padding:6px 12px;font-size:1rem;font-weight:600;width:100%;max-width:340px;margin-top:6px;font-family:inherit;}
+    .trip-name-input::placeholder{color:rgba(255,255,255,0.6);}
+    .trip-name-input:focus{outline:none;background:rgba(255,255,255,0.3);}
 
-    .container{max-width:900px;margin:0 auto;padding:20px;}
-    .trips-grid{grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;display:grid;margin:20px 0;}
-    .trip-card{background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;transition:transform 0.2s,box-shadow 0.2s;cursor:pointer;}
-    .trip-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
-    .trip-card h3{font-size:1.3rem;margin:0 0 8px 0;color:var(--gray-800);}
-    .trip-card-meta{display:flex;gap:12px;font-size:0.85rem;color:var(--gray-600);margin-bottom:12px;}
-    .trip-card-actions{display:flex;gap:8px;margin-top:16px;}
-    .trip-card-actions button{flex:1;padding:8px 12px;border:none;border-radius:var(--radius-sm);cursor:pointer;font-weight:600;transition:0.2s;}
-    .trip-card-actions .edit{background:var(--primary);color:white;}
-    .trip-card-actions .edit:hover{background:#4a7bce;}
-    .trip-card-actions .delete{background:#ef4444;color:white;}
-    .trip-card-actions .delete:hover{background:#dc2626;}
+    /* タブ */
+    .tab-nav{display:flex;background:var(--white);border-bottom:2px solid var(--gray-100);overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+    .tab-nav::-webkit-scrollbar{display:none;}
+    .tab-btn{flex:none;padding:12px 16px;font-size:0.82rem;font-weight:600;color:var(--gray-400);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;gap:5px;}
+    .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);}
+    .tab-btn:hover:not(.active){color:var(--gray-600);background:var(--gray-50);}
 
-    .tabs{display:flex;gap:0;border-bottom:2px solid var(--gray-200);margin-bottom:20px;background:white;border-radius:var(--radius) var(--radius) 0 0;}
-    .tabs button{background:none;border:none;padding:16px 20px;cursor:pointer;font-size:1rem;color:var(--gray-600);border-bottom:3px solid transparent;transition:0.3s;}
-    .tabs button.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600;}
-    .tabs button:hover{color:var(--primary);}
+    /* コンテンツ */
+    .main-content{max-width:900px;margin:0 auto;padding:20px 16px 80px;}
 
-    .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
-    .section-title{display:flex;gap:12px;align-items:center;font-size:1.3rem;font-weight:700;color:var(--gray-800);}
-    .icon{font-size:1.8rem;display:inline-block;}
+    /* 旅行一覧 */
+    .trips-hero{text-align:center;padding:32px 16px 20px;max-width:900px;margin:0 auto;}
+    .trips-hero h2{font-size:1.5rem;font-weight:700;color:var(--gray-800);margin-bottom:6px;}
+    .trips-hero p{font-size:0.88rem;color:var(--gray-500);}
+    .trips-grid{max-width:900px;margin:0 auto;padding:0 16px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+    .trip-new-card{border:2.5px dashed var(--gray-300);border-radius:var(--radius);padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.2s;background:white;color:var(--gray-400);display:flex;flex-direction:column;align-items:center;gap:8px;min-height:140px;justify-content:center;}
+    .trip-new-card:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light);transform:translateY(-2px);box-shadow:var(--shadow);}
+    .trip-new-card .new-icon{font-size:2rem;}
+    .trip-new-card .new-text{font-size:0.9rem;font-weight:600;}
+    .trip-card{background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:all 0.22s;border:2px solid transparent;display:flex;flex-direction:column;min-height:140px;}
+    .trip-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--primary-light);}
+    .trip-card-cover{height:8px;}
+    .trip-card-body{padding:14px 16px;flex:1;display:flex;flex-direction:column;}
+    .trip-card-name{font-size:1rem;font-weight:700;color:var(--gray-800);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+    .trip-card-stats{display:flex;flex-wrap:wrap;gap:6px;font-size:0.75rem;color:var(--gray-500);margin-bottom:10px;}
+    .trip-stat{display:flex;align-items:center;gap:3px;background:var(--gray-50);padding:2px 7px;border-radius:20px;}
+    .trip-card-footer{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--gray-100);}
+    .trip-total{font-size:0.9rem;font-weight:700;color:var(--primary);}
+    .trip-card-del-btn{background:none;border:none;cursor:pointer;padding:4px 7px;border-radius:var(--radius-sm);font-size:0.8rem;color:var(--gray-400);transition:all 0.15s;}
+    .trip-card-del-btn:hover{background:#fef2f2;color:#ef4444;}
 
-    .btn{padding:10px 20px;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:1rem;font-weight:600;transition:0.3s;display:inline-flex;align-items:center;gap:8px;}
-    .btn-primary{background:var(--primary);color:white;}
-    .btn-primary:hover{background:#4a7bce;}
-    .btn-cancel{background:var(--gray-200);color:var(--gray-700);}
-    .btn-cancel:hover{background:var(--gray-300);}
-    .btn-danger{background:#ef4444;color:white;}
-    .btn-danger:hover{background:#dc2626;}
-    .btn-edit{background:var(--gray-200);color:var(--gray-700);padding:6px 12px;font-size:0.9rem;}
-    .btn-edit:hover{background:var(--gray-300);}
-    .btn-sm{padding:6px 12px;font-size:0.9rem;}
+    /* モーダル */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;}
+    .modal{background:white;border-radius:var(--radius);padding:24px;width:100%;max-width:400px;box-shadow:var(--shadow-md);}
+    .modal h3{font-size:1.1rem;font-weight:700;color:var(--gray-800);margin-bottom:16px;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
 
-    .card{background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px;}
-    .card-form{background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:20px;display:none;}
-    .card-form.active{display:block;}
+    /* セクション */
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+    .section-title{font-size:1.1rem;font-weight:700;color:var(--gray-800);display:flex;align-items:center;gap:8px;}
+    .section-title .icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
 
-    .form-title{font-size:1.2rem;font-weight:700;color:var(--gray-800);margin-bottom:20px;}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-    .form-group{display:flex;flex-direction:column;gap:8px;}
+    /* フォーム */
+    .card{background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:12px;}
+    .card-form{background:var(--white);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:20px;border:2px solid var(--primary-light);}
+    .form-title{font-size:0.92rem;font-weight:700;color:var(--primary);margin-bottom:14px;}
+    .form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
+    .form-group{display:flex;flex-direction:column;gap:4px;}
     .form-group.full{grid-column:1/-1;}
-    .form-group label{font-weight:600;color:var(--gray-700);font-size:0.95rem;}
-    .form-group input,.form-group select,.form-group textarea{padding:10px 12px;border:1px solid var(--gray-300);border-radius:var(--radius-sm);font-size:1rem;font-family:inherit;}
-    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,141,238,0.1);}
-    .form-group textarea{resize:vertical;min-height:80px;}
-    .form-actions{display:flex;gap:12px;margin-top:20px;}
-    .form-actions button{flex:1;}
+    label{font-size:0.75rem;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.04em;}
+    input[type="text"],input[type="date"],input[type="time"],input[type="number"],select,textarea{border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:8px 10px;font-size:0.88rem;color:var(--gray-700);background:var(--gray-50);width:100%;transition:border-color 0.2s;font-family:inherit;}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);background:white;}
+    textarea{resize:vertical;min-height:64px;}
+    .form-actions{display:flex;gap:8px;margin-top:14px;justify-content:flex-end;flex-wrap:wrap;}
 
-    .fade-in{animation:fadeIn 0.3s ease-in;}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+    /* ---- 関連情報セクション（スケジュールフォーム内） ---- */
+    .linked-section{border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);margin-top:12px;overflow:hidden;}
+    .linked-section-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--gray-50);cursor:pointer;user-select:none;}
+    .linked-section-header:hover{background:var(--gray-100);}
+    .linked-section-label{display:flex;align-items:center;gap:8px;font-size:0.85rem;font-weight:600;color:var(--gray-700);}
+    .linked-toggle-wrap{display:flex;align-items:center;gap:8px;}
+    .linked-toggle-text{font-size:0.75rem;color:var(--gray-500);}
+    .linked-section-body{padding:12px 14px;border-top:1px solid var(--gray-200);}
+    /* 小トグル */
+    .toggle-sm{position:relative;width:36px;height:20px;display:inline-block;cursor:pointer;}
+    .toggle-sm input{opacity:0;width:0;height:0;}
+    .toggle-slider-sm{position:absolute;inset:0;background:var(--gray-300);border-radius:20px;transition:0.25s;}
+    .toggle-slider-sm::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.25s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+    .toggle-sm input:checked+.toggle-slider-sm{background:var(--green);}
+    .toggle-sm input:checked+.toggle-slider-sm::before{transform:translateX(16px);}
 
-    .empty-state{text-align:center;padding:60px 20px;color:var(--gray-500);}
-    .empty-icon{font-size:4rem;margin-bottom:16px;}
+    /* ボタン */
+    .btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;font-family:inherit;}
+    .btn-primary{background:var(--primary);color:white;}
+    .btn-primary:hover{background:#4a7de0;transform:translateY(-1px);}
+    .btn-danger{background:transparent;color:#ef4444;padding:4px 8px;font-size:0.78rem;}
+    .btn-danger:hover{background:#fef2f2;}
+    .btn-edit{background:transparent;color:var(--primary);padding:4px 8px;font-size:0.78rem;}
+    .btn-edit:hover{background:var(--primary-light);}
+    .btn-cancel{background:var(--gray-100);color:var(--gray-600);}
+    .btn-cancel:hover{background:var(--gray-200);}
+    .btn-sm{padding:6px 12px;font-size:0.8rem;}
 
-    .item-list{display:flex;flex-direction:column;gap:12px;}
-    .item-card{background:white;border-radius:var(--radius);padding:16px;border-left:4px solid var(--primary);display:flex;gap:16px;align-items:flex-start;box-shadow:0 1px 3px rgba(0,0,0,0.05);transition:0.3s;}
+    /* アイテムカード */
+    .item-list{display:flex;flex-direction:column;gap:8px;}
+    .item-card{background:white;border:1.5px solid var(--gray-100);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:flex-start;gap:10px;transition:box-shadow 0.2s;}
     .item-card:hover{box-shadow:var(--shadow);}
     .item-card-body{flex:1;min-width:0;}
-    .item-title{font-weight:700;color:var(--gray-800);margin-bottom:4px;word-break:break-word;}
-    .item-meta{display:flex;gap:12px;font-size:0.85rem;color:var(--gray-600);flex-wrap:wrap;}
-    .item-meta span{}
-    .badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;}
-    .badge-primary{background:var(--primary-light);color:var(--primary);}
-    .badge-success{background:var(--green-light);color:var(--green);}
-    .badge-warning{background:var(--orange-light);color:var(--orange);}
-    .badge-danger{background:#fecaca;color:#dc2626;}
-    .payee-ayano{background:#e0e7ff;color:#4f46e5;}
-    .payee-takuya{background:#fce7f3;color:#be185d;}
-    .payee-common{background:var(--gray-100);color:var(--gray-700);}
+    .item-card-actions{display:flex;gap:2px;flex-shrink:0;}
+    .item-title{font-weight:600;font-size:0.9rem;color:var(--gray-800);margin-bottom:4px;}
+    .item-meta{display:flex;flex-wrap:wrap;gap:6px;font-size:0.78rem;color:var(--gray-500);}
+
+    /* 関連バッジ */
+    .linked-badge{display:inline-flex;align-items:center;gap:3px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;padding:2px 7px;border-radius:20px;font-size:0.7rem;font-weight:600;}
+
+    /* バッジ */
+    .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:600;}
     .badge-blue{background:var(--primary-light);color:var(--primary);}
-    .badge-pink{background:var(--accent-light);color:var(--accent);}
-    .badge-orange{background:var(--orange-light);color:var(--orange);}
-    .badge-purple{background:var(--purple-light);color:var(--purple);}
-    .badge-green{background:var(--green-light);color:var(--green);}
-    .badge-gray{background:var(--gray-100);color:var(--gray-700);}
-    .linked-badge{font-size:0.8rem;background:var(--gray-100);color:var(--gray-700);padding:4px 8px;border-radius:4px;margin-top:5px;display:inline-block;}
-    .item-card-actions{display:flex;gap:8px;margin-left:auto;}
+    .badge-pink{background:var(--accent-light);color:#d63384;}
+    .badge-green{background:var(--green-light);color:#1e8449;}
+    .badge-orange{background:var(--orange-light);color:#c0770a;}
+    .badge-purple{background:var(--purple-light);color:#6c5ce7;}
+    .badge-gray{background:var(--gray-100);color:var(--gray-600);}
+    .payer-ayano{background:var(--accent-light);color:#d63384;}
+    .payer-takuya{background:var(--primary-light);color:var(--primary);}
+    .payer-common{background:var(--green-light);color:#1e8449;}
 
-    .table-wrap{overflow-x:auto;}
-    .budget-table{width:100%;border-collapse:collapse;font-size:0.95rem;}
-    .budget-table th{background:var(--gray-100);padding:12px;text-align:left;font-weight:700;color:var(--gray-800);border-bottom:2px solid var(--gray-300);}
-    .budget-table td{padding:12px;border-bottom:1px solid var(--gray-200);}
-    .budget-table tr:hover{background:var(--gray-50);}
-    .diff-amount{color:var(--primary);font-weight:700;}
-    .summary-card{background:white;border-radius:var(--radius);padding:20px;margin-top:16px;background:var(--accent-light);}
-    .summary-amount{font-size:1.2rem;font-weight:700;color:#d63384;margin-bottom:4px;}
-    .summary-label{font-size:0.82rem;font-weight:700;color:#d63384;margin-bottom:4px;}
+    /* 集計 */
+    .summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
+    .summary-card{background:white;border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);text-align:center;}
+    .summary-card .label{font-size:0.72rem;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;}
+    .summary-card .amount{font-size:1.15rem;font-weight:700;color:var(--gray-800);}
+    .summary-card.highlight{background:linear-gradient(135deg,var(--primary) 0%,#7c6bff 100%);}
+    .summary-card.highlight .label{color:rgba(255,255,255,0.8);}
+    .summary-card.highlight .amount{color:white;font-size:1.3rem;}
+    .summary-card.ayano{background:linear-gradient(135deg,#ff8fab 0%,#ff6b9d 100%);}
+    .summary-card.ayano .label{color:rgba(255,255,255,0.85);}
+    .summary-card.ayano .amount{color:white;}
+    .summary-card.takuya{background:linear-gradient(135deg,#5b8dee 0%,#4a7de0 100%);}
+    .summary-card.takuya .label{color:rgba(255,255,255,0.85);}
+    .summary-card.takuya .amount{color:white;}
+    .diff-card{background:white;border-radius:var(--radius);padding:14px 18px;box-shadow:var(--shadow);margin-bottom:16px;display:flex;align-items:center;gap:10px;border-left:4px solid var(--orange);}
+    .diff-card .diff-text{font-size:0.9rem;font-weight:600;color:var(--gray-700);}
+    .diff-card .diff-amount{font-weight:700;color:var(--orange);}
 
-    .error-message{color:#ef4444;font-size:0.9rem;margin-top:8px;}
-    .success-message{color:var(--green);font-size:0.9rem;margin-top:8px;}
+    /* トグル（大） */
+    .toggle-wrap{display:flex;align-items:center;gap:10px;background:white;border-radius:var(--radius);padding:12px 16px;box-shadow:var(--shadow);margin-bottom:20px;}
+    .toggle-wrap span{font-size:0.88rem;font-weight:600;color:var(--gray-700);}
+    .toggle{position:relative;width:44px;height:24px;display:inline-block;cursor:pointer;}
+    .toggle input{opacity:0;width:0;height:0;}
+    .toggle-slider{position:absolute;inset:0;background:var(--gray-300);border-radius:24px;transition:0.3s;}
+    .toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+    .toggle input:checked+.toggle-slider{background:var(--green);}
+    .toggle input:checked+.toggle-slider::before{transform:translateX(20px);}
+
+    .empty-state{text-align:center;padding:40px 20px;color:var(--gray-400);}
+    .empty-state .empty-icon{font-size:2.5rem;margin-bottom:8px;}
+    .empty-state p{font-size:0.88rem;}
+
+    /* 予算テーブル */
+    .budget-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+    .budget-table th{background:var(--gray-50);padding:8px 10px;text-align:left;font-weight:600;color:var(--gray-500);border-bottom:1.5px solid var(--gray-200);white-space:nowrap;}
+    .budget-table td{padding:9px 10px;border-bottom:1px solid var(--gray-100);vertical-align:middle;}
+    .budget-table tr:hover td{background:var(--gray-50);}
+    .table-wrap{overflow-x:auto;border-radius:var(--radius-sm);}
+    .breakdown-table{width:100%;border-collapse:collapse;}
+    .breakdown-table td{padding:8px 10px;font-size:0.85rem;border-bottom:1px solid var(--gray-100);}
+    .breakdown-table td:last-child{text-align:right;font-weight:600;}
+    .breakdown-table tr:last-child td{border-bottom:none;}
+    .summary-section-card{background:white;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px;}
+    .summary-section-title{font-size:0.88rem;font-weight:700;color:var(--gray-600);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--gray-100);}
+
+    /* レスポンシブ */
+    @media(max-width:600px){
+      .form-grid{grid-template-columns:1fr 1fr;}
+      .summary-grid{grid-template-columns:1fr 1fr;}
+      .app-header h1{font-size:1.2rem;}
+      .main-content{padding:14px 12px 80px;}
+      .trips-grid{grid-template-columns:1fr 1fr;}
+    }
+    @media(max-width:380px){
+      .form-grid{grid-template-columns:1fr;}
+      .trips-grid{grid-template-columns:1fr;}
+    }
+    .fade-in{animation:fadeIn 0.28s ease;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
   </style>
 </head>
-<body data-theme="light" x-data="appData()" x-cloak>
+<body x-data="travelApp()" x-init="init()">
+
+  <!-- ヘッダー -->
   <div class="app-header">
     <div class="app-header-inner">
-      <h1>✈️ 旅行のしおり</h1>
+      <template x-if="currentTripId !== null">
+        <button class="back-btn" @click="closeTrip()">← 一覧に戻る</button>
+      </template>
+      <div class="header-title-block">
+        <template x-if="currentTripId === null">
+          <div><h1>✈️ 旅行のしおり</h1><p class="subtitle">複数の旅行をまとめて管理</p></div>
+        </template>
+        <template x-if="currentTripId !== null">
+          <div>
+            <h1>✈️ 旅行のしおり</h1>
+            <input class="trip-name-input" type="text" x-model="currentTrip().name" @input="save()" placeholder="旅行名を入力（例：沖縄旅行 2026）"/>
+          </div>
+        </template>
+      </div>
     </div>
   </div>
 
-  <div class="container">
-    <p>Travel app placeholder. Full implementation will be loaded.</p>
-  </div>
+  <!-- タブ（詳細画面のみ） -->
+  <template x-if="currentTripId !== null">
+    <div class="tab-nav">
+      <button class="tab-btn" :class="{active:activeTab==='schedule'}" @click="activeTab='schedule'">📅 スケジュール</button>
+      <button class="tab-btn" :class="{active:activeTab==='transport'}" @click="activeTab='transport'">🚄 交通</button>
+      <button class="tab-btn" :class="{active:activeTab==='hotel'}" @click="activeTab='hotel'">🏨 宿泊</button>
+      <button class="tab-btn" :class="{active:activeTab==='budget'}" @click="activeTab='budget'">💰 予算</button>
+      <button class="tab-btn" :class="{active:activeTab==='summary'}" @click="activeTab='summary'">📊 集計</button>
+    </div>
+  </template>
+
+  <!-- 旅行一覧 -->
+  <template x-if="currentTripId === null">
+    <div class="fade-in">
+      <div class="trips-hero">
+        <h2>🗺️ あなたの旅行一覧</h2>
+        <p>旅行を選んで、しえりを開きましょう</p>
+      </div>
+      <div class="trips-grid">
+        <div class="trip-new-card" @click="openNewTripModal()">
+          <div class="new-icon">＋</div>
+          <div class="new-text">新しい旅行を作成</div>
+        </div>
+        <template x-for="trip in trips" :key="trip.id">
+          <div class="trip-card" @click="openTrip(trip.id)">
+            <div class="trip-card-cover" :style="'background:'+trip.color"></div>
+            <div class="trip-card-body">
+              <div class="trip-card-name">
+                <span x-text="trip.emoji||'✈️'"></span>
+                <span x-text="trip.name||'無題の旅行'"></span>
+              </div>
+              <div class="trip-card-stats">
+                <span class="trip-stat">📅 <span x-text="(trip.schedules||[]).length+'件'"></span></span>
+                <span class="trip-stat">🚄 <span x-text="(trip.transports||[]).length+'件'"></span></span>
+                <span class="trip-stat">🏨 <span x-text="(trip.hotels||[]).length+'件'"></span></span>
+                <span class="trip-stat">💰 <span x-text="(trip.budgets||[]).length+'件'"></span></span>
+              </div>
+              <div class="trip-card-footer">
+                <span class="trip-total" x-text="'合計 ¥'+formatNum(tripGrandTotal(trip))"></span>
+                <div @click.stop>
+                  <button class="trip-card-del-btn" @click="deleteTrip(trip.id)">🗑️</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </template>
+
+  <!-- 新規旅行モーダル -->
+  <template x-if="showNewTripModal">
+    <div class="modal-overlay" @click.self="showNewTripModal=false">
+      <div class="modal fade-in">
+        <h3>✈️ 新しい旅行を作成</h3>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label>旅行名</label>
+          <input type="text" x-model="newTripName" placeholder="例：沖縄旅行 2026" @keydown.enter="createTrip()"/>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:0.75rem;font-weight:600;color:var(--gray-500);display:block;margin-bottom:6px;">アイコン</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <template x-for="e in ['✈️','🏝️','🗻','🏙️','🚂','🚢','🏕️','🌸','🎡','🍜','🎿','🌺']" :key="e">
+              <button @click="newTripEmoji=e" :style="newTripEmoji===e?'background:var(--primary-light);border:2px solid var(--primary);':'background:var(--gray-50);border:2px solid var(--gray-200);'" style="width:38px;height:38px;border-radius:8px;font-size:1.2rem;cursor:pointer;transition:all 0.15s;" x-text="e"></button>
+            </template>
+          </div>
+        </div>
+        <div style="margin-bottom:4px;">
+          <label style="font-size:0.75rem;font-weight:600;color:var(--gray-500);display:block;margin-bottom:6px;">カラー</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <template x-for="c in tripColors" :key="c">
+              <div @click="newTripColor=c" :style="'background:'+c+';width:28px;height:28px;border-radius:50%;cursor:pointer;border:'+(newTripColor===c?'3px solid #333':'3px solid transparent')+';transition:all 0.15s;'"></div>
+            </template>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-cancel" @click="showNewTripModal=false">キャンセル</button>
+          <button class="btn btn-primary" @click="createTrip()">作成する</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- 旅行詳細画面 -->
+  <template x-if="currentTripId !== null">
+    <div class="main-content">
+
+      <!-- ==============================
+           スケジュールタブ
+      ============================== -->
+      <div x-show="activeTab==='schedule'" class="fade-in">
+        <div class="section-header">
+          <div class="section-title">
+            <div class="icon" style="background:var(--primary-light);">📅</div>スケジュール管理
+          </div>
+          <button class="btn btn-primary btn-sm" @click="showScheduleForm=!showScheduleForm">
+            <span x-text="showScheduleForm?'✕ 閉じる':'＋ 追加'"></span>
+          </button>
+        </div>
+
+        <!-- スケジュール追加・編集フォーム -->
+        <div x-show="showScheduleForm" class="card-form fade-in">
+          <div class="form-title" x-text="editingScheduleId?'✏️ スケジュール編集':'＋ スケジュール追加'"></div>
+
+          <!-- スケジュール本体 -->
+          <div class="form-grid">
+            <div class="form-group"><label>日付 *</label><input type="date" x-model="scheduleForm.date"/></div>
+            <div class="form-group"><label>開始時間</label><input type="time" x-model="scheduleForm.startTime"/></div>
+            <div class="form-group"><label>終了時間</label><input type="time" x-model="scheduleForm.endTime"/></div>
+            <div class="form-group full"><label>内容 *</label><input type="text" x-model="scheduleForm.title" placeholder="例：るよしもと新喜劇"/></div>
+            <div class="form-group full"><label>メモ</label><textarea x-model="scheduleForm.memo" placeholder="メモを入力"></textarea></div>
+          </div>
+
+          <!-- 関連する予算情報 -->
+          <div class="linked-section">
+            <div class="linked-section-header" @click="scheduleLinked.budget.open=!scheduleLinked.budget.open">
+              <div class="linked-section-label">💰 この予定に関連する予算を追加</div>
+              <div class="linked-toggle-wrap" @click.stop>
+                <span class="linked-toggle-text" x-text="scheduleLinked.budget.enabled?'ON':'OFF'"></span>
+                <label class="toggle-sm">
+                  <input type="checkbox" x-model="scheduleLinked.budget.enabled" @change="if(scheduleLinked.budget.enabled) scheduleLinked.budget.open=true">
+                  <span class="toggle-slider-sm"></span>
+                </label>
+                <span style="font-size:0.8rem;color:var(--gray-400);" x-text="scheduleLinked.budget.open?'▲':'▼'"></span>
+              </div>
+            </div>
+            <div x-show="scheduleLinked.budget.open && scheduleLinked.budget.enabled" class="linked-section-body">
+              <div class="form-grid">
+                <div class="form-group full"><label>項目名</label><input type="text" x-model="scheduleLinked.budget.title" placeholder="例：ユニバ入場料"/></div>
+                <div class="form-group">
+                  <label>カテゴリ</label>
+                  <select x-model="scheduleLinked.budget.category">
+                    <option value="交通費">🚄 交通費</option><option value="宿泊費">🏨 宿泊費</option>
+                    <option value="食費">🍽️ 食費</option><option value="観光費">🎡 観光費</option>
+                    <option value="買い物">🛍️ 買い物</option><option value="その他">🔹 その他</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>金額（円）</label><input type="number" x-model="scheduleLinked.budget.amount" min="0" placeholder="0"/></div>
+                <div class="form-group">
+                  <label>支払者</label>
+                  <select x-model="scheduleLinked.budget.payer">
+                    <option value="彩乃">彩乃</option><option value="拓也">拓也</option><option value="共通">共通</option>
+                  </select>
+                </div>
+                <div class="form-group full"><label>メモ</label><textarea x-model="scheduleLinked.budget.memo" placeholder="メモを入力"></textarea></div>
+              </div>
+            </div>
+            <div x-show="scheduleLinked.budget.open && !scheduleLinked.budget.enabled" class="linked-section-body" style="color:var(--gray-400);font-size:0.82rem;text-align:center;padding:16px;">
+              トグルをONにすると予算を入力できます
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-cancel" @click="cancelScheduleForm()">キャンセル</button>
+            <button class="btn btn-primary" @click="saveSchedule()" x-text="editingScheduleId?'更新する':'追加する'"></button>
+          </div>
+        </div>
+
+        <!-- スケジュール一覧 -->
+        <template x-if="currentTrip().schedules.length===0">
+          <div class="empty-state"><div class="empty-icon">📅</div><p>スケジュールがまだありません</p></div>
+        </template>
+        <template x-for="group in groupedSchedules()" :key="group.date">
+          <div class="card" style="padding:0;overflow:hidden;margin-bottom:12px;">
+            <div style="background:var(--primary-light);padding:10px 14px;font-weight:700;font-size:0.88rem;color:var(--primary);">
+              📅 <span x-text="formatDate(group.date)"></span>
+            </div>
+            <div style="padding:8px 12px;">
+              <template x-for="item in group.items" :key="item.id">
+                <div class="item-card">
+                  <div class="item-card-body">
+                    <div class="item-title" x-text="item.title||'（タイトルなし）'"></div>
+                    <div class="item-meta">
+                      <template x-if="item.startTime||item.time">
+                        <span>🕐 <span x-text="(item.startTime||item.time)+(item.endTime?'〜'+item.endTime:'')"></span></span>
+                      </template>
+                      <template x-if="item.memo"><span style="color:var(--gray-400);" x-text="'📝 '+item.memo"></span></template>
+                    </div>
+                    <!-- 紐づき情報バッジ -->
+                    <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;">
+                      <template x-if="hasLinkedTransport(item.id)"><span class="linked-badge">🚄 交通あり</span></template>
+                      <template x-if="hasLinkedHotel(item.id)"><span class="linked-badge">🏨 宿泊あり</span></template>
+                      <template x-if="hasLinkedBudget(item.id)"><span class="linked-badge">💰 予算あり</span></template>
+                    </div>
+                  </div>
+                  <div class="item-card-actions">
+                    <button class="btn btn-edit" @click="editSchedule(item)">✏️</button>
+                    <button class="btn btn-danger" @click="deleteSchedule(item.id)">🗑️</button>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- ==============================
+           交通タブ（単独追加も可、関連表示付ぎ）
+      ============================== -->
+      <div x-show="activeTab==='transport'" class="fade-in">
+        <div class="section-header">
+          <div class="section-title"><div class="icon" style="background:#e8f4ff;">🚄</div>交通機関管理</div>
+          <button class="btn btn-primary btn-sm" @click="showTransportForm=!showTransportForm">
+            <span x-text="showTransportForm?'✕ 閉じる':'＋ 追加'"></span>
+          </button>
+        </div>
+        <div x-show="showTransportForm" class="card-form fade-in">
+          <div class="form-title" x-text="editingTransportId?'✏️ 交通情報編集':'＋ 交通情報追加'"></div>
+          <div class="form-grid">
+            <div class="form-group"><label>利用日 *</label><input type="date" x-model="transportForm.date"/></div>
+            <div class="form-group">
+              <label>交通機関 *</label>
+              <select x-model="transportForm.type">
+                <option value="">選択</option>
+                <option value="電車">🚃 電車</option><option value="新幹線">🚄 新幹線</option>
+                <option value="飛行機">✈️ 飛行機</option><option value="バス">🚌 バス</option>
+                <option value="車">🚗 車</option><option value="徒歩">🚶 徒歩</option>
+                <option value="その他">🔹 その他</option>
+              </select>
+            </div>
+            <div class="form-group"><label>出発地</label><input type="text" x-model="transportForm.from" placeholder="例：東京駅"/></div>
+            <div class="form-group"><label>到着地</label><input type="text" x-model="transportForm.to" placeholder="例：大阪駅"/></div>
+            <div class="form-group"><label>出発時間</label><input type="time" x-model="transportForm.departTime"/></div>
+            <div class="form-group"><label>到着時間</label><input type="time" x-model="transportForm.arriveTime"/></div>
+            <div class="form-group"><label>金額（円）</label><input type="number" x-model="transportForm.amount" min="0" placeholder="0"/></div>
+            <div class="form-group">
+              <label>支払者</label>
+              <select x-model="transportForm.payer">
+                <option value="彩乃">彩乃</option><option value="拓也">拓也</option><option value="共通">共通</option>
+              </select>
+            </div>
+            <div class="form-group full"><label>メモ</label><textarea x-model="transportForm.memo" placeholder="予約番号など"></textarea></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-cancel" @click="cancelTransportForm()">キャンセル</button>
+            <button class="btn btn-primary" @click="saveTransport()" x-text="editingTransportId?'更新する':'追加する'"></button>
+          </div>
+        </div>
+        <template x-if="currentTrip().transports.length===0">
+          <div class="empty-state"><div class="empty-icon">🚄</div><p>交通情報がまだありません</p></div>
+        </template>
+        <div class="item-list">
+          <template x-for="item in sortedTransports()" :key="item.id">
+            <div class="item-card">
+              <div style="font-size:1.5rem;flex-shrink:0;" x-text="transportEmoji(item.type)"></div>
+              <div class="item-card-body">
+                <div class="item-title"><span x-text="item.from||'出発地'"></span> → <span x-text="item.to||'到着地'"></span></div>
+                <div class="item-meta">
+                  <span x-text="formatDate(item.date)"></span>
+                  <template x-if="item.departTime||item.arriveTime"><span x-text="(item.departTime||'')+(item.arriveTime?' → '+item.arriveTime:'')"></span></template>
+                  <template x-if="item.type"><span class="badge badge-blue" x-text="item.type"></span></template>
+                  <span :class="payerBadge(item.payer)" class="badge" x-text="item.payer"></span>
+                  <template x-if="item.amount>0"><span style="font-weight:700;" x-text="'¥'+formatNum(item.amount)"></span></template>
+                  <template x-if="item.memo"><span style="color:var(--gray-400);" x-text="'📝 '+item.memo"></span></template>
+                </div>
+                <!-- スケジュール紐づきバッジ -->
+                <template x-if="item.scheduleId">
+                  <div style="margin-top:5px;">
+                    <span class="linked-badge">📅 <span x-text="formatDate(item.scheduleDate)+' '+item.scheduleTitle"></span></span>
+                  </div>
+                </template>
+              </div>
+              <div class="item-card-actions">
+                <button class="btn btn-edit" @click="editTransport(item)">✏️</button>
+                <button class="btn btn-danger" @click="deleteTransport(item.id)">🗑️</button>
+              </div>
+            </div>
+          </template>
+        </div>
+        <template x-if="currentTrip().transports.length>0">
+          <div class="card" style="margin-top:16px;background:var(--primary-light);">
+            <div style="font-size:0.82rem;font-weight:700;color:var(--primary);margin-bottom:4px;">交通費合計</div>
+            <div style="font-size:1.2rem;font-weight:700;color:var(--primary);" x-text="'¥'+formatNum(transportTotal())"></div>
+          </div>
+        </template>
+      </div>
+
+      <!-- ==============================
+           宿泊タブ
+      ============================== -->
+      <div x-show="activeTab==='hotel'" class="fade-in">
+        <div class="section-header">
+          <div class="section-title"><div class="icon" style="background:#fff0f4;">🏨</div>宿泊情報管理</div>
+          <button class="btn btn-primary btn-sm" @click="showHotelForm=!showHotelForm">
+            <span x-text="showHotelForm?'✕ 閉じる':'＋ 追加'"></span>
+          </button>
+        </div>
+        <div x-show="showHotelForm" class="card-form fade-in">
+          <div class="form-title" x-text="editingHotelId?'✏️ 宿泊情報編集':'＋ 宿泊情報追加'"></div>
+          <div class="form-grid">
+            <div class="form-group full"><label>宿泊施設名 *</label><input type="text" x-model="hotelForm.name" placeholder="例：ホテル東京"/></div>
+            <div class="form-group"><label>チェックイン *</label><input type="date" x-model="hotelForm.checkIn"/></div>
+            <div class="form-group"><label>チェックアウト *</label><input type="date" x-model="hotelForm.checkOut"/></div>
+            <div class="form-group full"><label>住所</label><input type="text" x-model="hotelForm.address" placeholder="例：東京都千代田区…"/></div>
+            <div class="form-group"><label>料金（円）</label><input type="number" x-model="hotelForm.amount" min="0" placeholder="0"/></div>
+            <div class="form-group">
+              <label>支払者</label>
+              <select x-model="hotelForm.payer">
+                <option value="彩乃">彩乃</option><option value="拓也">拓也</option><option value="共通">共通</option>
+              </select>
+            </div>
+            <div class="form-group full"><label>メモ</label><textarea x-model="hotelForm.memo" placeholder="予約番号・注意事項など"></textarea></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-cancel" @click="cancelHotelForm()">キャンセル</button>
+            <button class="btn btn-primary" @click="saveHotel()" x-text="editingHotelId?'更新する':'追加する'"></button>
+          </div>
+        </div>
+        <template x-if="currentTrip().hotels.length===0">
+          <div class="empty-state"><div class="empty-icon">🏨</div><p>宿泊情報がまだありません</p></div>
+        </template>
+        <div class="item-list">
+          <template x-for="item in sortedHotels()" :key="item.id">
+            <div class="item-card">
+              <div style="font-size:1.5rem;flex-shrink:0;">🏨</div>
+              <div class="item-card-body">
+                <div class="item-title" x-text="item.name||'（施設名なし）'"></div>
+                <div class="item-meta">
+                  <span x-text="formatDate(item.checkIn)+' → '+formatDate(item.checkOut)"></span>
+                  <span :class="payerBadge(item.payer)" class="badge" x-text="item.payer"></span>
+                  <template x-if="item.amount>0"><span style="font-weight:700;" x-text="'¥'+formatNum(item.amount)"></span></template>
+                </div>
+                <template x-if="item.address"><div style="font-size:0.78rem;color:var(--gray-400);margin-top:4px;" x-text="'📍 '+item.address"></div></template>
+                <template x-if="item.memo"><div style="font-size:0.78rem;color:var(--gray-400);margin-top:2px;" x-text="'📝 '+item.memo"></div></template>
+                <template x-if="item.scheduleId">
+                  <div style="margin-top:5px;"><span class="linked-badge">📅 <span x-text="formatDate(item.scheduleDate)+' '+item.scheduleTitle"></span></span></div>
+                </template>
+              </div>
+              <div class="item-card-actions">
+                <button class="btn btn-edit" @click="editHotel(item)">✏️</button>
+                <button class="btn btn-danger" @click="deleteHotel(item.id)">🗑️</button>
+              </div>
+            </div>
+          </template>
+        </div>
+        <template x-if="currentTrip().hotels.length>0">
+          <div class="card" style="margin-top:16px;background:var(--accent-light);">
+            <div style="font-size:0.82rem;font-weight:700;color:#d63384;margin-bottom:4px;">宿泊費合計</div>
+            <div style="font-size:1.2rem;font-weight:700;color:#d63384;" x-text="'¥'+formatNum(hotelTotal())"></div>
+          </div>
+        </template>
+      </div>
+
+      <!-- ==============================
+           予算タブ
+      ============================== -->
+      <div x-show="activeTab==='budget'" class="fade-in">
+        <div class="section-header">
+          <div class="section-title"><div class="icon" style="background:var(--green-light);">💰</div>予算管理</div>
+          <button class="btn btn-primary btn-sm" @click="showBudgetForm=!showBudgetForm">
+            <span x-text="showBudgetForm?'✕ 閉じる':'＋ 追加'"></span>
+          </button>
+        </div>
+        <div x-show="showBudgetForm" class="card-form fade-in">
+          <div class="form-title" x-text="editingBudgetId?'✏️ 予算項目編集':'＋ 予算項目追加'"></div>
+          <div class="form-grid">
+            <div class="form-group"><label>日付</label><input type="date" x-model="budgetForm.date"/></div>
+            <div class="form-group"><label>項目名 *</label><input type="text" x-model="budgetForm.title" placeholder="例：昼食"/></div>
+            <div class="form-group">
+              <label>カテゴリ</label>
+              <select x-model="budgetForm.category">
+                <option value="交通費">🚄 交通費</option><option value="宿泊費">🏨 宿泊費</option>
+                <option value="食費">🍽️ 食費</option><option value="観光費">🎡 観光費</option>
+                <option value="買い物">🛍️ 買い物</option><option value="その他">🔹 その他</option>
+              </select>
+            </div>
+            <div class="form-group"><label>金額（円）</label><input type="number" x-model="budgetForm.amount" min="0" placeholder="0"/></div>
+            <div class="form-group">
+              <label>支払者</label>
+              <select x-model="budgetForm.payer">
+                <option value="彩乃">彩乃</option><option value="拓也">拓也</option><option value="共通">共通</option>
+              </select>
+            </div>
+            <div class="form-group full"><label>メモ</label><textarea x-model="budgetForm.memo" placeholder="メモを入力"></textarea></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-cancel" @click="cancelBudgetForm()">キャンセル</button>
+            <button class="btn btn-primary" @click="saveBudget()" x-text="editingBudgetId?'更新する':'追加する'"></button>
+          </div>
+        </div>
+        <template x-if="currentTrip().budgets.length===0">
+          <div class="empty-state"><div class="empty-icon">💰</div><p>予算項目がまだありません</p></div>
+        </template>
+        <template x-if="currentTrip().budgets.length>0">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div class="table-wrap">
+              <table class="budget-table">
+                <thead>
+                  <tr>
+                    <th>日付</th><th>項目名</th><th>カテゴリ</th><th>金額</th><th>支払者</th><th>関連予定</th><th style="text-align:center;">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="item in sortedBudgets()" :key="item.id">
+                    <tr>
+                      <td style="white-space:nowrap;" x-text="item.date?formatDate(item.date):'—'"></td>
+                      <td style="font-weight:600;" x-text="item.title||'—'"></td>
+                      <td><span class="badge" :class="categoryBadge(item.category)" x-text="item.category"></span></td>
+                      <td style="text-align:right;font-weight:700;white-space:nowrap;" x-text="item.amount>0?'¥'+formatNum(item.amount):'—'"></td>
+                      <td><span class="badge" :class="payerBadge(item.payer)" x-text="item.payer"></span></td>
+                      <td style="font-size:0.75rem;color:var(--gray-500);">
+                        <template x-if="item.scheduleId">
+                          <span class="linked-badge">📅 <span x-text="item.scheduleTitle||'予定'"></span></span>
+                        </template>
+                        <template x-if="!item.scheduleId"><span style="color:var(--gray-300);">—</span></template>
+                      </td>
+                      <td style="text-align:center;white-space:nowrap;">
+                        <button class="btn btn-edit" style="padding:3px 7px;" @click="editBudget(item)">✏️</button>
+                        <button class="btn btn-danger" style="padding:3px 7px;" @click="deleteBudget(item.id)">🗑️</button>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+                <tfoot>
+                  <tr style="background:var(--gray-50);">
+                    <td colspan="3" style="font-weight:700;padding:10px;">合計</td>
+                    <td style="text-align:right;font-weight:700;font-size:1rem;" x-text="'¥'+formatNum(budgetTotal())"></td>
+                    <td colspan="3"></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- ==============================
+           集計タブ
+      ============================== -->
+      <div x-show="activeTab==='summary'" class="fade-in">
+        <div class="section-title" style="margin-bottom:16px;">
+          <div class="icon" style="background:var(--orange-light);">📊</div>支払い集計
+        </div>
+        <div class="toggle-wrap">
+          <span>🔀 共通費を折半する</span>
+          <label class="toggle">
+            <input type="checkbox" x-model="currentTrip().splitMode" @change="save()">
+            <span class="toggle-slider"></span>
+          </label>
+          <span style="font-size:0.8rem;color:var(--gray-400);" x-text="currentTrip().splitMode?'ON（共通費を2人で折半）':'OFF（共通費は別集計）'"></span>
+        </div>
+        <div class="diff-card" x-show="diffMessage()!==''">
+          <span style="font-size:1.3rem;">⚖️</span>
+          <span class="diff-text" x-html="diffMessage()"></span>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-card highlight">
+            <div class="label">旗行合計</div>
+            <div class="amount" x-text="'¥'+formatNum(grandTotal())"></div>
+          </div>
+          <div class="summary-card">
+            <div class="label">🚄 交通費</div>
+            <div class="amount" x-text="'¥'+formatNum(categoryTotal('交通費'))"></div>
+          </div>
+          <div class="summary-card">
+            <div class="label">🏨 宿泊費</div>
+            <div class="amount" x-text="'¥'+formatNum(categoryTotal('宿泊費'))"></div>
+          </div>
+          <div class="summary-card">
+            <div class="label">🍽️ 食費</div>
+            <div class="amount" x-text="'¥'+formatNum(categoryTotal('食費'))"></div>
+          </div>
+          <div class="summary-card">
+            <div class="label">🎡 観光費</div>
+            <div class="amount" x-text="'¥'+formatNum(categoryTotal('観光費'))"></div>
+          </div>
+          <div class="summary-card">
+            <div class="label">🛍️ 買い物</div>
+            <div class="amount" x-text="'¥'+formatNum(categoryTotal('買い物'))"></div>
+          </div>
+          <div class="summary-card">
+            <div class="label">🔹 その他</div>
+            <div class="amount" x-text="'¥'+formatNum(categoryTotal('その他'))"></div>
+          </div>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-card ayano">
+            <div class="label">💗 彩乃 負担額</div>
+            <div class="amount" x-text="'¥'+formatNum(calcCalcs().ayano)"></div>
+          </div>
+          <div class="summary-card takuya">
+            <div class="label">💙 拓也 負担額</div>
+            <div class="amount" x-text="'¥'+formatNum(calcCalcs().takuya)"></div>
+          </div>
+          <div class="summary-card" style="border:2px solid var(--green);">
+            <div class="label" style="color:var(--green);">🤝 共通費</div>
+            <div class="amount" style="color:var(--green);" x-text="'¥'+formatNum(calcCalcs().common)"></div>
+          </div>
+        </div>
+        <div x-show="currentTrip().splitMode">
+          <div class="summary-grid">
+            <div class="summary-card" style="border:2px solid #ff8fab;">
+              <div class="label" style="color:#d63384;">💗 彩乃（折半後）</div>
+              <div class="amount" style="color:#d63384;" x-text="'¥'+formatNum(calcCalcs().ayanoAfterSplit)"></div>
+              <div style="font-size:0.72rem;color:var(--gray-400);margin-top:4px;">自己負担 + 共通÷2</div>
+            </div>
+            <div class="summary-card" style="border:2px solid #5b8dee;">
+              <div class="label" style="color:var(--primary);">💙 拓也（折半後）</div>
+              <div class="amount" style="color:var(--primary);" x-text="'¥'+formatNum(calcCalcs().takuyaAfterSplit)"></div>
+              <div style="font-size:0.72rem;color:var(--gray-400);margin-top:4px;">自己負担 + 共通÷2</div>
+            </div>
+          </div>
+        </div>
+        <div class="summary-section-card">
+          <div class="summary-section-title">💗 彩乃・💙 拓也 内訳</div>
+          <template x-if="currentTrip().budgets.length===0">
+            <div style="color:var(--gray-400);font-size:0.85rem;text-align:center;padding:12px;">予算データがありません</div>
+          </template>
+          <table class="breakdown-table" x-show="currentTrip().budgets.length>0">
+            <tr><td>💗 彩乃 支払額</td><td x-text="'¥'+formatNum(calcCalcs().ayano)"></td></tr>
+            <tr><td>💙 拓也 支払額</td><td x-text="'¥'+formatNum(calcCalcs().takuya)"></td></tr>
+            <tr><td>🤝 共通 支払額</td><td x-text="'¥'+formatNum(calcCalcs().common)"></td></tr>
+          </table>
+        </div>
+        <div class="summary-section-card">
+          <div class="summary-section-title">🗂️ カテゴリ別内訳（予算ベース）</div>
+          <template x-if="currentTrip().budgets.length===0">
+            <div style="color:var(--gray-400);font-size:0.85rem;text-align:center;padding:12px;">予算データがありません</div>
+          </template>
+          <table class="breakdown-table" x-show="currentTrip().budgets.length>0">
+            <template x-for="cat in categoryBreakdown()" :key="cat.name">
+              <tr>
+                <td><span class="badge" :class="categoryBadge(cat.name)" x-text="cat.name"></span></td>
+                <td x-text="'¥'+formatNum(cat.total)"></td>
+              </tr>
+            </template>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /main-content -->
+  </template>
 
   <script>
-    function appData() {
-      return {
-        trips: [],
-        activeTrip: null
-      }
-    }
+  /**
+   * ===================================================
+   * travelApp() — Alpine.js メインオブジェクト
+   * 機能:
+   *  - 複数旅行管理（一覧 / 詳細画面）
+   *  - スケジュール追加時に交通・宿泊・予算を同時登録
+   *  - 関連データのスケジュールID紐づき
+   *  - 各タブでは個別追加も維持
+   *  - 全データ LocalStorage 保存
+   * ===================================================
+   */
+  function travelApp() {
+    return {
+      // ---- 旅行一覧 ----
+      trips: [],
+      currentTripId: null,
+
+      // ---- 新規旅行モーダル ----
+      showNewTripModal: false,
+      newTripName: '',
+      newTripEmoji: '✈️',
+      newTripColor: '#5b8dee',
+      tripColors: ['#5b8dee','#ff8fab','#34c97e','#ff9f43','#a29bfe','#fd79a8','#00b894','#e17055','#74b9ff','#636e72'],
+
+      // ---- タブ ----
+      activeTab: 'schedule',
+
+      // ---- フォーム表示フラグ ----
+      showScheduleForm: false,
+      showTransportForm: false,
+      showHotelForm: false,
+      showBudgetForm: false,
+
+      // ---- 編集中ID ----
+      editingScheduleId: null,
+      editingTransportId: null,
+      editingHotelId: null,
+      editingBudgetId: null,
+
+      // ---- スケジュール本体フォーム ----
+      scheduleForm: { date:'', startTime:'', endTime:'', title:'', memo:'' },
+
+      // ---- スケジュールに紐づく予算フォーム ----
+      // enabled: ON/OFFトグル, open: 折りたたみ開閉
+      scheduleLinked: {
+        budget: {
+          enabled: false, open: false,
+          existingId: null,
+          title:'', category:'食費', amount:'', payer:'共通', memo:''
+        }
+      },
+
+      // ---- 交通フォーム（個別追加用） ----
+      transportForm: { date:'', type:'', from:'', to:'', departTime:'', arriveTime:'', amount:'', payer:'彩乃', memo:'' },
+
+      // ---- 宿泊フォーム（個別追加用） ----
+      hotelForm: { name:'', checkIn:'', checkOut:'', address:'', amount:'', payer:'彩乃', memo:'' },
+
+      // ---- 予算フォーム（個別追加用） ----
+      budgetForm: { date:'', title:'', category:'食費', amount:'', payer:'彩乃', memo:'' },
+
+      // ==============================
+      // 初期化・保存
+      // ==============================
+
+      /** LocalStorageからデータを読み込む */
+      init() {
+        try {
+          const data = JSON.parse(localStorage.getItem('travelApp_v2') || '{}');
+          this.trips = data.trips || [];
+        } catch(e) {
+          this.trips = [];
+        }
+
+        // ==============================
+        // 大阪旅行 (2026,5) プリセットデータ
+        // スプレッドシートから読み込み済み
+        // 色判定: 黄=拓也払い / 青=彩乃払い / 白=共通
+        // ==============================
+        const OSAKA_ID = 'osaka-2026-05-preset';
+        if (!this.trips.find(t => t.id === OSAKA_ID)) {
+          const osakaTrip = {
+            id: OSAKA_ID,
+            name: '大阪旅行 (2026,5)',
+            emoji: '🏙️',
+            color: '#ff9f43',
+            splitMode: false,
+            createdAt: '2026-04-07T00:00:00.000Z',
+            schedules: [
+              { id:'os1',  date:'2026-05-16', startTime:'09:00', endTime:'11:30', title:'東京駅 出発（のそみ135）', memo:'' },
+              { id:'os2',  date:'2026-05-16', startTime:'11:30', endTime:'',      title:'大阪駅 到着', memo:'' },
+              { id:'os3',  date:'2026-05-16', startTime:'',      endTime:'',      title:'昼食', memo:'' },
+              { id:'os4',  date:'2026-05-16', startTime:'14:00', endTime:'',      title:'ユニバオフ会', memo:'' },
+              { id:'os5',  date:'2026-05-16', startTime:'',      endTime:'',      title:'夕食', memo:'' },
+              { id:'os6',  date:'2026-05-16', startTime:'23:00', endTime:'',      title:'ホテル阪神大阪 チェックイン', memo:'' },
+              { id:'os7',  date:'2026-05-17', startTime:'',      endTime:'',      title:'朝食', memo:'' },
+              { id:'os8',  date:'2026-05-17', startTime:'09:30', endTime:'12:10', title:'よしもと新喜劇', memo:'' },
+              { id:'os9',  date:'2026-05-17', startTime:'',      endTime:'',      title:'昼食（黒門市場）', memo:'' },
+              { id:'os10', date:'2026-05-17', startTime:'',      endTime:'',      title:'お土産', memo:'' },
+              { id:'os11', date:'2026-05-17', startTime:'16:50', endTime:'18:10', title:'伊丹空港 出発', memo:'' },
+              { id:'os12', date:'2026-05-17', startTime:'18:10', endTime:'',      title:'羽田空港 到着', memo:'' },
+              { id:'os13', date:'2026-05-17', startTime:'',      endTime:'',      title:'夕食', memo:'' },
+            ],
+            transports: [
+              { id:'ot1', date:'2026-05-16', type:'新幹線', from:'東京駅', to:'大阪駅', departTime:'09:00', arriveTime:'11:30', amount:14520, payer:'拓也', memo:'のぞみ135', scheduleId:'os1', scheduleTitle:'東京駅 出発（のぞみ135）', scheduleDate:'2026-05-16' },
+              { id:'ot2', date:'2026-05-17', type:'飛行機', from:'伊丹空港', to:'羽田空港', departTime:'16:50', arriveTime:'18:10', amount:11690, payer:'拓也', memo:'', scheduleId:'os11', scheduleTitle:'伊丹空港 出発', scheduleDate:'2026-05-17' },
+            ],
+            hotels: [
+              { id:'oh1', name:'ホテル阪神大阪', checkIn:'2026-05-16', checkOut:'2026-05-17', address:'', amount:12800, payer:'拓也', memo:'', scheduleId:'os6', scheduleTitle:'ホテル阪神大阪 チェックイン', scheduleDate:'2026-05-16' },
+            ],
+            budgets: [
+              { id:'ob1', date:'2026-05-16', title:'昼食',         category:'食費', amount:2000,  payer:'彩乃', memo:'' },
+              { id:'ob2', date:'2026-05-16', title:'ユニバオフ会', category:'観光費', amount:12400, payer:'拓也', memo:'', scheduleId:'os4', scheduleTitle:'ユニバオフ会', scheduleDate:'2026-05-16' },
+              { id:'ob3', date:'2026-05-16', title:'夕食',         category:'食費', amount:5000,  payer:'彩乃', memo:'' },
+              { id:'ob4', date:'2026-05-17', title:'朝食',         category:'食費', amount:2000,  payer:'彩乃', memo:'' },
+              { id:'ob5', date:'2026-05-17', title:'よしもと新喜劇', category:'観光費', amount:4650, payer:'拓也', memo:'', scheduleId:'os8', scheduleTitle:'よしもと新喜劇', scheduleDate:'2026-05-17' },
+              { id:'ob6', date:'2026-05-17', title:'昼食（黒門市場）', category:'食費', amount:3000, payer:'共通', memo:'' },
+              { id:'ob7', date:'2026-05-17', title:'お土産',       category:'買い物', amount:5000, payer:'彩乃', memo:'' },
+              { id:'ob8', date:'2026-05-17', title:'夕食',         category:'食費', amount:3000,  payer:'彩乃', memo:'' },
+            ],
+          };
+          this.trips.unshift(osakaTrip);
+          this.save();
+        }
+      },
+
+      /** LocalStorageへ保存する */
+      save() {
+        try {
+          localStorage.setItem('travelApp_v2', JSON.stringify({ trips: this.trips }));
+        } catch(e) { console.warn('保存エラー', e); }
+      },
+
+      /** ユニークID生成 */
+      uid() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2);
+      },
+
+      // ==============================
+      // 旅行 CRUD
+      // ==============================
+
+      emptyTrip(name, emoji, color) {
+        return {
+          id: this.uid(), name: name||'', emoji: emoji||'✈️', color: color||'#5b8dee',
+          splitMode: false, schedules:[], transports:[], hotels:[], budgets:[],
+          createdAt: new Date().toISOString(),
+        };
+      },
+
+      openNewTripModal() {
+        this.newTripName=''; this.newTripEmoji='✈️'; this.newTripColor='#5b8dee';
+        this.showNewTripModal=true;
+      },
+
+      createTrip() {
+        const trip = this.emptyTrip(this.newTripName, this.newTripEmoji, this.newTripColor);
+        this.trips.unshift(trip);
+        this.save();
+        this.showNewTripModal=false;
+        this.openTrip(trip.id);
+      },
+
+      openTrip(id) {
+        this.currentTripId=id; this.activeTab='schedule';
+        this.resetAllForms();
+        window.scrollTo({top:0});
+      },
+
+      closeTrip() {
+        this.currentTripId=null;
+        this.resetAllForms();
+        window.scrollTo({top:0});
+      },
+
+      deleteTrip(id) {
+        const trip = this.trips.find(t=>t.id===id);
+        if (!trip) return;
+        if (!confirm(`「${trip.name||'無題の旅行'}」を削除しますか？\nこの操作は取り消せません。`)) return;
+        this.trips = this.trips.filter(t=>t.id!==id);
+        this.save();
+      },
+
+      /** 現在の旅行オブジェクトを返す */
+      currentTrip() {
+        return this.trips.find(t=>t.id===this.currentTripId) || this.emptyTrip();
+      },
+
+      tripGrandTotal(trip) {
+        return (trip.budgets||[]).reduce((a,x)=>a+Number(x.amount||0),0);
+      },
+
+      resetAllForms() {
+        this.showScheduleForm=false; this.showTransportForm=false;
+        this.showHotelForm=false; this.showBudgetForm=false;
+        this.editingScheduleId=null; this.editingTransportId=null;
+        this.editingHotelId=null; this.editingBudgetId=null;
+        this.scheduleForm={date:'*,startTime:'',endTime:'',title:'',memo:''};
+        this.resetLinkedForms();
+        this.transportForm={date:'',type:'',from:'',to:'',departTime:'',arriveTime:'',amount:'',payer:'彩乃',memo:''};
+        this.hotelForm={name:'',checkIn:'',checkOut:'',address:'',amount:'',payer:'彩乃',memo:''};
+        this.budgetForm={date:'',title:'',category:'食費',amount:'',payer:'彩乃',memo:''};
+      },
+
+      /** スケジュールフォームの関連情報部分をリセット */
+      resetLinkedForms() {
+        this.scheduleLinked = {
+          budget: { enabled:false, open:false, existingId:null, title:'', category:'食費', amount:'', payer:'共通', memo:'' },
+        };
+      },
+
+      // ==============================
+      // 関連情報チェック（スケジュールカードのバッジ表示用）
+      // ==============================
+
+      /** スケジュールIDに紐づく交通が存在するか */
+      hasLinkedTransport(scheduleId) {
+        return (this.currentTrip().transports||[]).some(t=>t.scheduleId===scheduleId);
+      },
+      /** スケジュールIDに紐づく宿泊が存在するか */
+      hasLinkedHotel(scheduleId) {
+        return (this.currentTrip().hotels||[]).some(h=>h.scheduleId===scheduleId);
+      },
+      /** スケジュールIDに紐づく予算が存在するか */
+      hasLinkedBudget(scheduleId) {
+        return (this.currentTrip().budgets||[]).some(b=>b.scheduleId===scheduleId);
+      },
+
+      // ==============================
+      // スケジュール CRUD（関連情報も同時保存）
+      // ==============================
+
+      /**
+       * スケジュールを保存する
+       * ONになっている交通・宿泊・予算も同時に trip.transports/hotels/budgets へ追加する
+       */
+      saveSchedule() {
+        if (!this.scheduleForm.date || !this.scheduleForm.title) {
+          alert('日付と内容は必須です'); return;
+        }
+        const trip = this.currentTrip();
+        const scheduleId   = this.editingScheduleId || this.uid();
+        const scheduleTitle = this.scheduleForm.title;
+        const scheduleDate  = this.scheduleForm.date;
+
+        // ---- スケジュール本体を保存 ----
+        if (this.editingScheduleId) {
+          const idx = trip.schedules.findIndex(s=>s.id===this.editingScheduleId);
+          if (idx>=0) trip.schedules[idx] = { ...this.scheduleForm, id: scheduleId };
+        } else {
+          trip.schedules.push({ ...this.scheduleForm, id: scheduleId });
+        }
+
+        // ---- 関連する予算情報を保存 ----
+        if (this.scheduleLinked.budget.enabled) {
+          const bData = {
+            date:     scheduleDate,
+            title:    this.scheduleLinked.budget.title || scheduleTitle,
+            category: this.scheduleLinked.budget.category||'その他',
+            amount:   Number(this.scheduleLinked.budget.amount)||0,
+            payer:    this.scheduleLinked.budget.payer||'共通',
+            memo:     this.scheduleLinked.budget.memo,
+            scheduleId, scheduleTitle, scheduleDate,
+          };
+          const existId = this.scheduleLinked.budget.existingId;
+          if (existId) {
+            const idx = trip.budgets.findIndex(b=>b.id===existId);
+            if (idx>=0) trip.budgets[idx] = { ...bData, id: existId };
+            else trip.budgets.push({ ...bData, id: this.uid() });
+          } else {
+            trip.budgets.push({ ...bData, id: this.uid() });
+          }
+        }
+
+        this.cancelScheduleForm();
+        this.save();
+      },
+
+      /**
+       * スケジュール編集開始
+       * 紐づく交通・宿泊・予算があればフォームに読み込む
+       */
+      editSchedule(item) {
+        this.scheduleForm = { ...item };
+        this.editingScheduleId = item.id;
+        this.resetLinkedForms();
+
+        const trip = this.currentTrip();
+
+        // 紐づく予算を探してフォームに読み込む
+        const linkedB = (trip.budgets||[]).find(b=>b.scheduleId===item.id);
+        if (linkedB) {
+          this.scheduleLinked.budget = {
+            enabled: true, open: true,
+            existingId: linkedB.id,
+            title: linkedB.title||'', category: linkedB.category||'食費',
+            amount: linkedB.amount||'', payer: linkedB.payer||'共通', memo: linkedB.memo||'',
+          };
+        }
+
+        this.showScheduleForm = true;
+        window.scrollTo({top:0, behavior:'smooth'});
+      },
+
+      /**
+       * スケジュール削除
+       * 紐づく交通・宿泊・予算も一緒に削除するか確認する
+       */
+      deleteSchedule(id) {
+        const trip = this.currentTrip();
+        const linkedT = (trip.transports||[]).filter(t=>t.scheduleId===id);
+        const linkedH = (trip.hotels||[]).filter(h=>h.scheduleId===id);
+        const linkedB = (trip.budgets||[]).filter(b=>b.scheduleId===id);
+        const hasLinked = linkedT.length+linkedH.length+linkedB.length > 0;
+
+        if (hasLinked) {
+          const details = [];
+          if (linkedT.length) details.push(`交通 ${linkedT.length}件`);
+          if (linkedH.length) details.push(`宿泊 ${linkedH.length}件`);
+          if (linkedB.length) details.push(`予算 ${linkedB.length}件`);
+          const msg = `このスケジュールに紐づく情報があります\n（${details.join('・')}）\n\n紐づく情報も一緒に削除しますか？\n\n「OK」→ スケジュール＋紐づく情報をすべて削除\n「キャンセル」→ スケジュールのみ削除`;
+          const deleteAll = confirm(msg);
+          if (deleteAll) {
+            // 紐づく全データを削除
+            const linkedIds = [...linkedT, ...linkedH, ...linkedB].map(x=>x.id);
+            trip.transports = (trip.transports||[]).filter(t=>t.scheduleId!==id);
+            trip.hotels     = (trip.hotels||[]).filter(h=>h.scheduleId!==id);
+            trip.budgets    = (trip.budgets||[]).filter(b=>b.scheduleId!==id);
+          }
+          // どちらの選択でもスケジュール本体は削除
+        } else {
+          if (!confirm('このスケジュールを削除しますか？')) return;
+        }
+
+        trip.schedules = (trip.schedules||[]).filter(s=>s.id!==id);
+        this.save();
+      },
+
+      cancelScheduleForm() {
+        this.scheduleForm={date:'',startTime:'',endTime:'',title:'',memo:''};
+        this.editingScheduleId=null;
+        this.showScheduleForm=false;
+        this.resetLinkedForms();
+      },
+
+      /** 日付でグループ化したスケジュールを返す（startTime優先、旧timeも対応） */
+      groupedSchedules() {
+        const map = {};
+        (this.currentTrip().schedules||[])
+          .slice().sort((a,b)=>{
+            const dateA=a.date||'', dateB=b.date||'';
+            if (dateA!==dateB) return dateA.localeCompare(dateB);
+            const timeA=a.startTime||a.time||'';
+            const timeB=b.startTime||b.time||'';
+            return timeA.localeCompare(timeB);
+          })
+          .forEach(s=>{
+            // 旧データ互換: time → startTime に変換
+            if (s.time && !s.startTime) { s.startTime=s.time; }
+            const d = s.date||'未設定';
+            if (!map[d]) map[d]={date:d,items:[]};
+            map[d].items.push(s);
+          });
+        return Object.values(map);
+      },
+
+      // ==============================
+      // 交通 CRUD（個別追加用）
+      // ==============================
+      saveTransport() {
+        if (!this.transportForm.date) { alert('利用日は必須です'); return; }
+        const trip = this.currentTrip();
+        const data = { ...this.transportForm, amount: Number(this.transportForm.amount)||0 };
+        if (this.editingTransportId) {
+          const idx = trip.transports.findIndex(t=>t.id===this.editingTransportId);
+          if (idx>=0) trip.transports[idx] = { ...data, id:this.editingTransportId };
+        } else {
+          trip.transports.push({ ...data, id:this.uid() });
+        }
+        this.cancelTransportForm(); this.save();
+      },
+      editTransport(item) {
+        this.transportForm={...item};
+        this.editingTransportId=item.id;
+        this.showTransportForm=true;
+        window.scrollTo({top:0,behavior:'smooth'});
+      },
+      deleteTransport(id) {
+        if (!confirm('この交通情報を削除しますか？')) return;
+        const trip = this.currentTrip();
+        trip.transports=(trip.transports||[]).filter(t=>t.id!==id);
+        this.save();
+      },
+      cancelTransportForm() {
+        this.transportForm={date:'',type:'',from:'',to:'',departTime:'',arriveTime:'',amount:'',payer:'彩乃',memo:''};
+        this.editingTransportId=null; this.showTransportForm=false;
+      },
+      sortedTransports() {
+        return (this.currentTrip().transports||[]).slice()
+          .sort((a,b)=>(a.date||'').localeCompare(b.date||'')||(a.departTime||'').localeCompare(b.departTime||''));
+      },
+
+      // ==============================
+      // 宿泊 CRUD（個別追加用）
+      // ==============================
+      saveHotel() {
+        if (!this.hotelForm.name||!this.hotelForm.checkIn) { alert('施設名とチェックイン日は必須です'); return; }
+        const trip = this.currentTrip();
+        const data = { ...this.hotelForm, amount: Number(this.hotelForm.amount)||0 };
+        if (this.editingHotelId) {
+          const idx = trip.hotels.findIndex(h=>h.id===this.editingHotelId);
+          if (idx>=0) trip.hotels[idx] = { ...data, id:this.editingHotelId };
+        } else {
+          trip.hotels.push({ ...data, id:this.uid() });
+        }
+        this.cancelHotelForm(); this.save();
+      },
+      editHotel(item) {
+        this.hotelForm={...item};
+        this.editingHotelId=item.id;
+        this.showHotelForm=true;
+        window.scrollTo({top:0,behavior:'smooth'});
+      },
+      deleteHotel(id) {
+        if (!confirm('この宿泊情報を削除しますか？')) return;
+        const trip = this.currentTrip();
+        trip.hotels=(trip.hotels||[]).filter(h=>h.id!==id);
+        this.save();
+      },
+      cancelHotelForm() {
+        this.hotelForm={name:'',checkIn:'',checkOut:'',address:'',amount:'',payer:'彩乃',memo:''};
+        this.editingHotelId=null; this.showHotelForm=false;
+      },
+      sortedHotels() {
+        return (this.currentTrip().hotels||[]).slice().sort((a,b)=>(a.checkIn||'').localeCompare(b.checkIn||''));
+      },
+
+      // ==============================
+      // 予算 CRUD（個別追加用）
+      // ==============================
+      saveBudget() {
+        if (!this.budgetForm.title) { alert('項目名は必須です'); return; }
+        const trip = this.currentTrip();
+        const data = { ...this.budgetForm, amount: Number(this.budgetForm.amount)||0 };
+        if (this.editingBudgetId) {
+          const idx = trip.budgets.findIndex(b=>b.id===this.editingBudgetId);
+          if (idx>=0) trip.budgets[idx] = { ...data, id:this.editingBudgetId };
+        } else {
+          trip.budgets.push({ ...data, id:this.uid() });
+        }
+        this.cancelBudgetForm(); this.save();
+      },
+      editBudget(item) {
+        this.budgetForm={...item};
+        this.editingBudgetId=item.id;
+        this.showBudgetForm=true;
+        window.scrollTo({top:0,behavior:'smooth'});
+      },
+      deleteBudget(id) {
+        if (!confirm('この予算項目を削除しますか？')) return;
+        const trip = this.currentTrip();
+        trip.budgets=(trip.budgets||[]).filter(b=>b.id!==id);
+        this.save();
+      },
+      cancelBudgetForm() {
+        this.budgetForm={date:'',title:'',category:'食費',amount:'',payer:'彩乃',memo:''};
+        this.editingBudgetId=null; this.showBudgetForm=false;
+      },
+      sortedBudgets() {
+        return (this.currentTrip().budgets||[]).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+      },
+
+      // ==============================
+      // 集計ロジック（予算データのカテゴリを元に集計）
+      // ==============================
+      /** 交通タブ用合計（集計には使わない） */
+      transportTotal() { return (this.currentTrip().transports||[]).reduce((s,t)=>s+Number(t.amount||0),0); },
+      /** 宿泊タブ用合計（集計には使わない） */
+      hotelTotal()     { return (this.currentTrip().hotels||[]).reduce((s,h)=>s+Number(h.amount||0),0); },
+      /** 予算合計（集計の基本） */
+      budgetTotal()    { return (this.currentTrip().budgets||[]).reduce((s,b)=>s+Number(b.amount||0),0); },
+      /** 旅行合計 = 予算合計のみ */
+      grandTotal()     { return this.budgetTotal(); },
+
+      /** カテゴリ別合計 */
+      categoryTotal(cat) {
+        return (this.currentTrip().budgets||[])
+          .filter(b=>b.category===cat)
+          .reduce((s,b)=>s+Number(b.amount||0),0);
+      },
+
+      calcCalcs() {
+        let ayano=0, takuya=0, common=0;
+        (this.currentTrip().budgets||[]).forEach(x=>{
+          const amt=Number(x.amount||0);
+          if (x.payer==='彩乃') ayano+=amt;
+          else if (x.payer==='拓也') takuya+=amt;
+          else common+=amt;
+        });
+        const half=Math.round(common/2);
+        return { ayano, takuya, common, ayanoAfterSplit:ayano+half, takuyaAfterSplit:takuya+(common-half) };
+      },
+
+      diffMessage() {
+        const c = this.calcCalcs();
+        const t = this.currentTrip();
+        const a = t.splitMode ? c.ayanoAfterSplit : c.ayano;
+        const b = t.splitMode ? c.takuyaAfterSplit : c.takuya;
+        if (a===0&&b===0) return '';
+        const diff=Math.abs(a-b);
+        if (diff===0) return '🎉 2人の負担額は同じです！';
+        const more = a>b?'彩乃':'拓也';
+        const label = t.splitMode?'（折半�~�）':'';
+        return `<span style="font-weight:700">${more}</span>さんが${label} <span class="diff-amount">¥${this.formatNum(diff)}</span> 多く負担しています`;
+      },
+
+      categoryBreakdown() {
+        const map={};
+        (this.currentTrip().budgets||[]).forEach(b=>{
+          const cat=b.category||'その他';
+          if(!map[cat]) map[cat]=0;
+          map[cat]+=Number(b.amount||0);
+        });
+        return Object.entries(map).map(([name,total])=>({name,total})).sort((a,b)=>b.total-a.total);
+      },
+
+      // ==============================
+      // ユーティリティ
+      // ==============================
+      formatNum(n) { return Number(n||0).toLocaleString('ja-JP'); },
+
+      formatDate(dateStr) {
+        if (!dateStr) return '—';
+        try {
+          const d=new Date(dateStr+'T00:00:00');
+          const w=['日','月','火','水','木','金','土'];
+          return `${d.getMonth()+1}/${d.getDate()}（${w[d.getDay()]}）`;
+        } catch(e) { return dateStr; }
+      },
+
+      transportEmoji(type) {
+        return {'電車':'🚃','新幹線':'🚄','飛行機':'✈️','バス':'🚌','車':'🚗','徒歩':'🚶','その他':'🔹'}[type]||'🔹';
+      },
+      payerBadge(payer) {
+        return payer==='彩乃'?'payer-ayano':payer==='拓也'?'payer-takuya':'payer-common';
+      },
+      categoryBadge(cat) {
+        return {'交通費':'badge-blue','宿泊費':'badge-pink','食費':'badge-orange','観光費':'badge-purple','観光':'badge-purple','買い物':'badge-green','その他':'badge-gray'}[cat]||'badge-gray';
+      },
+    };
+  }
   </script>
+
 </body>
 </html>
