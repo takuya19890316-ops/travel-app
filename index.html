@@ -214,6 +214,38 @@
     .cat-total-bar .total-amount{font-size:1.3rem;font-weight:700;color:white;}
     @media(max-width:600px){.cat-summary-grid{grid-template-columns:repeat(3,1fr);}}
     @media(max-width:380px){.cat-summary-grid{grid-template-columns:repeat(2,1fr);}}
+
+    /* ===== 旅行サマリーヒーローカード ===== */
+    .trip-summary-hero{background:linear-gradient(135deg,var(--primary) 0%,#7c6bff 100%);border-radius:var(--radius);padding:20px;margin-bottom:20px;color:white;box-shadow:var(--shadow-md);}
+    .trip-summary-top{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+    .trip-summary-emoji{font-size:2.2rem;line-height:1;}
+    .trip-summary-name{font-size:1.25rem;font-weight:700;letter-spacing:0.01em;}
+    .trip-summary-date{font-size:0.8rem;opacity:0.8;margin-top:3px;}
+    .trip-summary-total{display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.25);padding-top:12px;}
+    .trip-summary-total-label{font-size:0.82rem;opacity:0.85;}
+    .trip-summary-total-amount{font-size:1.6rem;font-weight:700;}
+
+    /* ===== タイムライン（スケジュールタブ） ===== */
+    .tl-group-card{background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px;}
+    .tl-date-header{background:var(--primary-light);padding:10px 16px;font-weight:700;font-size:0.88rem;color:var(--primary);border-bottom:2px solid rgba(91,141,238,0.15);}
+    .tl-container{position:relative;padding:12px 12px 12px 28px;}
+    .tl-container::before{content:'';position:absolute;left:11px;top:20px;bottom:20px;width:2px;background:var(--gray-200);border-radius:2px;}
+    .tl-item{position:relative;margin-bottom:10px;}
+    .tl-item:last-child{margin-bottom:0;}
+    .tl-item::before{content:'';position:absolute;left:-20px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--primary);border:2px solid white;box-shadow:0 0 0 2px var(--primary);z-index:1;}
+
+    /* ===== item-card 強化 ===== */
+    .item-card{border-radius:var(--radius) !important;box-shadow:0 2px 8px rgba(0,0,0,0.07) !important;padding:14px 16px !important;border:1.5px solid var(--gray-100) !important;transition:transform 0.15s,box-shadow 0.15s !important;}
+    .item-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.1) !important;}
+
+    /* ===== カテゴリ別左ボーダー ===== */
+    .item-card-schedule  {border-left:4px solid var(--primary) !important;}
+    .item-card-transport {border-left:4px solid #5b8dee !important;}
+    .item-card-hotel     {border-left:4px solid var(--purple) !important;}
+    .item-card-food      {border-left:4px solid var(--orange) !important;}
+    .item-card-sight     {border-left:4px solid var(--green) !important;}
+    .item-card-shop      {border-left:4px solid var(--accent) !important;}
+    .item-card-other     {border-left:4px solid var(--gray-300) !important;}
   </style>
 </head>
 <body x-data="travelApp()" x-init="init()">
@@ -341,6 +373,21 @@
   <template x-if="currentTripId !== null">
     <div class="main-content">
 
+      <!-- 旅行サマリーカード -->
+      <div class="trip-summary-hero">
+        <div class="trip-summary-top">
+          <span class="trip-summary-emoji" x-text="currentTrip().emoji||'✈️'"></span>
+          <div>
+            <div class="trip-summary-name" x-text="currentTrip().name||'無題の旅行'"></div>
+            <div class="trip-summary-date" x-show="tripDateRange()" x-text="tripDateRange()"></div>
+          </div>
+        </div>
+        <div class="trip-summary-total">
+          <span class="trip-summary-total-label">✈️ 旅行合計</span>
+          <span class="trip-summary-total-amount" x-text="formatYen(grandTotal())"></span>
+        </div>
+      </div>
+
       <!-- ==============================
            スケジュールタブ
       ============================== -->
@@ -417,13 +464,11 @@
           <div class="empty-state"><div class="empty-icon">📅</div><p>スケジュールがまだありません</p></div>
         </template>
         <template x-for="group in groupedSchedules()" :key="group.date">
-          <div class="card" style="padding:0;overflow:hidden;margin-bottom:12px;">
-            <div style="background:var(--primary-light);padding:10px 14px;font-weight:700;font-size:0.88rem;color:var(--primary);">
-              📅 <span x-text="formatDate(group.date)"></span>
-            </div>
-            <div style="padding:8px 12px;">
+          <div class="tl-group-card">
+            <div class="tl-date-header">📅 <span x-text="formatDate(group.date)"></span></div>
+            <div class="tl-container">
               <template x-for="item in group.items" :key="item.id">
-                <div class="item-card">
+                <div class="item-card tl-item item-card-schedule">
                   <div class="item-card-body">
                     <div class="item-title" x-text="item.title||'（タイトルなし）'"></div>
                     <div class="item-meta">
@@ -432,7 +477,6 @@
                       </template>
                       <template x-if="item.memo"><span style="color:var(--gray-400);" x-text="'📝 '+item.memo"></span></template>
                     </div>
-                    <!-- 紐づき情報バッジ -->
                     <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;">
                       <template x-if="hasLinkedTransport(item.id)"><span class="linked-badge">🚄 交通あり</span></template>
                       <template x-if="hasLinkedHotel(item.id)"><span class="linked-badge">🏨 宿泊あり</span></template>
@@ -497,7 +541,7 @@
         </template>
         <div class="item-list">
           <template x-for="item in sortedTransports()" :key="item.id">
-            <div class="item-card">
+            <div class="item-card item-card-transport">
               <div style="font-size:1.5rem;flex-shrink:0;" x-text="transportEmoji(item.type)"></div>
               <div class="item-card-body">
                 <div class="item-title"><span x-text="item.from||'出発地'"></span> → <span x-text="item.to||'到着地'"></span></div>
@@ -567,7 +611,7 @@
         </template>
         <div class="item-list">
           <template x-for="item in sortedHotels()" :key="item.id">
-            <div class="item-card">
+            <div class="item-card item-card-hotel">
               <div style="font-size:1.5rem;flex-shrink:0;">🏨</div>
               <div class="item-card-body">
                 <div class="item-title" x-text="item.name||'（施設名なし）'"></div>
@@ -669,7 +713,7 @@
                 </thead>
                 <tbody>
                   <template x-for="item in sortedBudgets()" :key="item.id">
-                    <tr>
+                    <tr :style="budgetRowStyle(item.category)">
                       <td style="white-space:nowrap;" x-text="item.date?formatDate(item.date):'—'"></td>
                       <td style="font-weight:600;" x-text="item.title||'—'"></td>
                       <td><span class="badge" :class="categoryBadge(item.category)" x-text="item.category"></span></td>
@@ -1560,6 +1604,21 @@
           const w=['日','月','火','水','木','金','土'];
           return `${d.getMonth()+1}/${d.getDate()}（${w[d.getDay()]}）`;
         } catch(e) { return dateStr; }
+      },
+
+      /** 旅行の日程範囲（スケジュールの最初〜最後の日付） */
+      tripDateRange() {
+        const dates = (this.currentTrip().schedules||[]).map(s=>s.date).filter(Boolean).sort();
+        if (!dates.length) return '';
+        if (dates[0]===dates[dates.length-1]) return dates[0];
+        return dates[0] + ' 〜 ' + dates[dates.length-1];
+      },
+
+      /** 予算テーブル行の左ボーダーカラー */
+      budgetRowStyle(cat) {
+        const colors = {'交通費':'#5b8dee','宿泊費':'#a29bfe','食費':'#ff9f43','観光費':'#34c97e','買い物':'#ff8fab','その他':'#9ca3af'};
+        const c = colors[cat]||colors['その他'];
+        return `border-left:3px solid ${c};`;
       },
 
       transportEmoji(type) {
