@@ -203,6 +203,17 @@
     }
     .fade-in{animation:fadeIn 0.28s ease;}
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+    /* 予算サマリー */
+    .cat-summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px;margin-bottom:12px;}
+    .cat-summary-item{background:var(--gray-50);border-radius:var(--radius-sm);padding:10px 12px;border:1.5px solid var(--gray-100);}
+    .cat-summary-item .cat-label{font-size:0.72rem;font-weight:600;color:var(--gray-500);margin-bottom:4px;}
+    .cat-summary-item .cat-amount{font-size:1rem;font-weight:700;color:var(--gray-800);}
+    .cat-total-bar{background:linear-gradient(135deg,var(--primary) 0%,#7c6bff 100%);border-radius:var(--radius-sm);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;}
+    .cat-total-bar .total-label{font-size:0.85rem;font-weight:600;color:rgba(255,255,255,0.85);}
+    .cat-total-bar .total-amount{font-size:1.3rem;font-weight:700;color:white;}
+    @media(max-width:600px){.cat-summary-grid{grid-template-columns:repeat(3,1fr);}}
+    @media(max-width:380px){.cat-summary-grid{grid-template-columns:repeat(2,1fr);}}
   </style>
 </head>
 <body x-data="travelApp()" x-init="init()">
@@ -590,6 +601,27 @@
            予算タブ
       ============================== -->
       <div x-show="activeTab==='budget'" class="fade-in">
+
+        <!-- 予算サマリー（交通・宿泊・予算 自動集計） -->
+        <div class="summary-section-card" style="margin-bottom:20px;">
+          <div class="summary-section-title">
+            📊 自動集計サマリー
+            <span style="font-size:0.72rem;font-weight:400;color:var(--gray-400);margin-left:6px;">交通・宿泊・予算の合算</span>
+          </div>
+          <div class="cat-summary-grid">
+            <template x-for="cat in budgetCategories" :key="cat.key">
+              <div class="cat-summary-item">
+                <div class="cat-label" x-text="cat.emoji + '\u00a0' + cat.key"></div>
+                <div class="cat-amount" x-text="formatYen(currentTripSummary().categories[cat.key] || 0)"></div>
+              </div>
+            </template>
+          </div>
+          <div class="cat-total-bar">
+            <span class="total-label">✈️ 旅行合計</span>
+            <span class="total-amount" x-text="formatYen(currentTripSummary().total)"></span>
+          </div>
+        </div>
+
         <div class="section-header">
           <div class="section-title"><div class="icon" style="background:var(--green-light);">💰</div>予算管理</div>
           <button class="btn btn-primary btn-sm" @click="showBudgetForm=!showBudgetForm">
@@ -748,21 +780,21 @@
         </div>
         <div class="summary-section-card">
           <div class="summary-section-title">💗 彩乃・💙 拓也 内訳</div>
-          <template x-if="currentTrip().budgets.length===0">
-            <div style="color:var(--gray-400);font-size:0.85rem;text-align:center;padding:12px;">予算データがありません</div>
+          <template x-if="grandTotal()===0">
+            <div style="color:var(--gray-400);font-size:0.85rem;text-align:center;padding:12px;">データがありません</div>
           </template>
-          <table class="breakdown-table" x-show="currentTrip().budgets.length>0">
+          <table class="breakdown-table" x-show="grandTotal()>0">
             <tr><td>💗 彩乃 支払額</td><td x-text="'¥'+formatNum(calcCalcs().ayano)"></td></tr>
             <tr><td>💙 拓也 支払額</td><td x-text="'¥'+formatNum(calcCalcs().takuya)"></td></tr>
             <tr><td>🤝 共通 支払額</td><td x-text="'¥'+formatNum(calcCalcs().common)"></td></tr>
           </table>
         </div>
         <div class="summary-section-card">
-          <div class="summary-section-title">🗂️ カテゴリ別内訳（予算ベース）</div>
-          <template x-if="currentTrip().budgets.length===0">
-            <div style="color:var(--gray-400);font-size:0.85rem;text-align:center;padding:12px;">予算データがありません</div>
+          <div class="summary-section-title">🗂️ カテゴリ別内訳（交通・宿泊・予算 合算）</div>
+          <template x-if="grandTotal()===0">
+            <div style="color:var(--gray-400);font-size:0.85rem;text-align:center;padding:12px;">データがありません</div>
           </template>
-          <table class="breakdown-table" x-show="currentTrip().budgets.length>0">
+          <table class="breakdown-table" x-show="grandTotal()>0">
             <template x-for="cat in categoryBreakdown()" :key="cat.name">
               <tr>
                 <td><span class="badge" :class="categoryBadge(cat.name)" x-text="cat.name"></span></td>
@@ -789,6 +821,18 @@
    * ===================================================
    */
   // ==============================
+  // カテゴリ定数（追加はここだけ変更すればOK）
+  // ==============================
+  const BUDGET_CATEGORIES = [
+    { key: '交通費',  emoji: '🚄', badge: 'badge-blue'   },
+    { key: '宿泊費',  emoji: '🏨', badge: 'badge-pink'   },
+    { key: '食費',    emoji: '🍽️', badge: 'badge-orange' },
+    { key: '観光費',  emoji: '🎡', badge: 'badge-purple' },
+    { key: '買い物',  emoji: '🛍️', badge: 'badge-green'  },
+    { key: 'その他',  emoji: '🔹', badge: 'badge-gray'   },
+  ];
+
+  // ==============================
   // Firebase 初期化
   // ==============================
   const _fbApp = firebase.initializeApp({
@@ -807,6 +851,9 @@
       // ---- 旅行一覧 ----
       trips: [],
       currentTripId: null,
+
+      // ---- カテゴリ定数（Alpine テンプレートから参照用） ----
+      budgetCategories: BUDGET_CATEGORIES,
 
       // ---- 共有 ----
       showShareModal: false,
@@ -1381,34 +1428,103 @@
       },
 
       // ==============================
-      // 集計ロジック（予算データのカテゴリを元に集計）
+      // 集計ロジック
       // ==============================
-      /** 交通タブ用合計（集計には使わない） */
-      transportTotal() { return (this.currentTrip().transports||[]).reduce((s,t)=>s+Number(t.amount||0),0); },
-      /** 宿泊タブ用合計（集計には使わない） */
-      hotelTotal()     { return (this.currentTrip().hotels||[]).reduce((s,h)=>s+Number(h.amount||0),0); },
-      /** 予算合計（集計の基本） */
-      budgetTotal()    { return (this.currentTrip().budgets||[]).reduce((s,b)=>s+Number(b.amount||0),0); },
-      /** 旅行合計 = 予算合計のみ */
-      grandTotal()     { return this.budgetTotal(); },
 
-      /** カテゴリ別合計 */
-      categoryTotal(cat) {
-        return (this.currentTrip().budgets||[])
-          .filter(b=>b.category===cat)
-          .reduce((s,b)=>s+Number(b.amount||0),0);
+      /** 安全な数値変換（カンマ入り文字列・null・不正値も 0 扱い） */
+      toNumber(val) {
+        if (val === null || val === undefined || val === '') return 0;
+        const n = Number(String(val).replace(/,/g, ''));
+        return isNaN(n) || !isFinite(n) ? 0 : n;
       },
 
-      calcCalcs() {
-        let ayano=0, takuya=0, common=0;
-        (this.currentTrip().budgets||[]).forEach(x=>{
-          const amt=Number(x.amount||0);
-          if (x.payer==='彩乃') ayano+=amt;
-          else if (x.payer==='拓也') takuya+=amt;
-          else common+=amt;
+      /** ¥形式でフォーマット */
+      formatYen(n) { return '¥' + this.toNumber(n).toLocaleString('ja-JP'); },
+
+      /**
+       * 重複なしの集計アイテムリストを返す（内部ヘルパー）
+       * - budgets[] は全件含む
+       * - transports[] は scheduleId に対応する 交通費 budget がない場合のみ加算
+       * - hotels[]     は scheduleId に対応する 宿泊費 budget がない場合のみ加算
+       */
+      _effectiveItems(trip) {
+        if (!trip) return [];
+        const items = [];
+
+        (trip.budgets || []).forEach(b => {
+          items.push({
+            category: b.category || 'その他',
+            amount:   this.toNumber(b.amount),
+            payer:    b.payer || '共通',
+          });
         });
-        const half=Math.round(common/2);
-        return { ayano, takuya, common, ayanoAfterSplit:ayano+half, takuyaAfterSplit:takuya+(common-half) };
+
+        // transports の重複除外（scheduleId が budgets の交通費エントリと一致するものをスキップ）
+        const budgetTransIds = new Set(
+          (trip.budgets || []).filter(b => b.scheduleId && b.category === '交通費').map(b => b.scheduleId)
+        );
+        (trip.transports || []).forEach(t => {
+          const amt = this.toNumber(t.amount);
+          if (amt <= 0) return;
+          if (t.scheduleId && budgetTransIds.has(t.scheduleId)) return;
+          items.push({ category: '交通費', amount: amt, payer: t.payer || '共通' });
+        });
+
+        // hotels の重複除外
+        const budgetHotelIds = new Set(
+          (trip.budgets || []).filter(b => b.scheduleId && b.category === '宿泊費').map(b => b.scheduleId)
+        );
+        (trip.hotels || []).forEach(h => {
+          const amt = this.toNumber(h.amount);
+          if (amt <= 0) return;
+          if (h.scheduleId && budgetHotelIds.has(h.scheduleId)) return;
+          items.push({ category: '宿泊費', amount: amt, payer: h.payer || '共通' });
+        });
+
+        return items;
+      },
+
+      /**
+       * カテゴリ別合計と総合計を返す
+       * 返り値: { categories: { '交通費': 0, ... }, total: 0 }
+       */
+      calculateBudgetSummary(trip) {
+        const cats = {};
+        BUDGET_CATEGORIES.forEach(c => { cats[c.key] = 0; });
+        this._effectiveItems(trip).forEach(item => {
+          if (cats[item.category] === undefined) cats[item.category] = 0;
+          cats[item.category] += item.amount;
+        });
+        const total = Object.values(cats).reduce((s, v) => s + v, 0);
+        return { categories: cats, total };
+      },
+
+      /** 現在の旅行の集計サマリー（テンプレートから呼び出し用） */
+      currentTripSummary() { return this.calculateBudgetSummary(this.currentTrip()); },
+
+      /** 交通タブ用合計（タブ内表示専用） */
+      transportTotal() { return (this.currentTrip().transports||[]).reduce((s,t)=>s+this.toNumber(t.amount),0); },
+      /** 宿泊タブ用合計（タブ内表示専用） */
+      hotelTotal()     { return (this.currentTrip().hotels||[]).reduce((s,h)=>s+this.toNumber(h.amount),0); },
+      /** 予算タブ用合計（テーブルフッター専用） */
+      budgetTotal()    { return (this.currentTrip().budgets||[]).reduce((s,b)=>s+this.toNumber(b.amount),0); },
+
+      /** 旅行合計（交通・宿泊・予算すべて込み） */
+      grandTotal() { return this.calculateBudgetSummary(this.currentTrip()).total; },
+
+      /** カテゴリ別合計（集計タブのカード用） */
+      categoryTotal(cat) { return this.calculateBudgetSummary(this.currentTrip()).categories[cat] || 0; },
+
+      /** 支払者別集計（交通・宿泊・予算すべて込み） */
+      calcCalcs() {
+        let ayano = 0, takuya = 0, common = 0;
+        this._effectiveItems(this.currentTrip()).forEach(item => {
+          if (item.payer === '彩乃') ayano += item.amount;
+          else if (item.payer === '拓也') takuya += item.amount;
+          else common += item.amount;
+        });
+        const half = Math.round(common / 2);
+        return { ayano, takuya, common, ayanoAfterSplit: ayano + half, takuyaAfterSplit: takuya + (common - half) };
       },
 
       diffMessage() {
@@ -1416,28 +1532,26 @@
         const t = this.currentTrip();
         const a = t.splitMode ? c.ayanoAfterSplit : c.ayano;
         const b = t.splitMode ? c.takuyaAfterSplit : c.takuya;
-        if (a===0&&b===0) return '';
-        const diff=Math.abs(a-b);
-        if (diff===0) return '🎉 2人の負担額は同じです！';
-        const more = a>b?'彩乃':'拓也';
-        const label = t.splitMode?'（折半�~�）':'';
+        if (a === 0 && b === 0) return '';
+        const diff = Math.abs(a - b);
+        if (diff === 0) return '🎉 2人の負担額は同じです！';
+        const more = a > b ? '彩乃' : '拓也';
+        const label = t.splitMode ? '（折半後）' : '';
         return `<span style="font-weight:700">${more}</span>さんが${label} <span class="diff-amount">¥${this.formatNum(diff)}</span> 多く負担しています`;
       },
 
+      /** カテゴリ別内訳（金額順、0円除外） */
       categoryBreakdown() {
-        const map={};
-        (this.currentTrip().budgets||[]).forEach(b=>{
-          const cat=b.category||'その他';
-          if(!map[cat]) map[cat]=0;
-          map[cat]+=Number(b.amount||0);
-        });
-        return Object.entries(map).map(([name,total])=>({name,total})).sort((a,b)=>b.total-a.total);
+        const cats = this.calculateBudgetSummary(this.currentTrip()).categories;
+        return BUDGET_CATEGORIES
+          .map(c => ({ name: c.key, total: cats[c.key] || 0 }))
+          .filter(c => c.total > 0);
       },
 
       // ==============================
       // ユーティリティ
       // ==============================
-      formatNum(n) { return Number(n||0).toLocaleString('ja-JP'); },
+      formatNum(n) { return this.toNumber(n).toLocaleString('ja-JP'); },
 
       formatDate(dateStr) {
         if (!dateStr) return '—';
