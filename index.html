@@ -1144,7 +1144,7 @@
       },
 
       tripGrandTotal(trip) {
-        return (trip.budgets||[]).reduce((a,x)=>a+Number(x.amount||0),0);
+        return this.calculateBudgetSummary(trip).total;
       },
 
       resetAllForms() {
