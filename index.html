@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>✈️ 旅行のしおり</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.5/cdn.min.js" defer></script>
   <style>
     :root {
@@ -264,7 +266,8 @@
               </div>
               <div class="trip-card-footer">
                 <span class="trip-total" x-text="'合計 ¥'+formatNum(tripGrandTotal(trip))"></span>
-                <div @click.stop>
+                <div @click.stop style="display:flex;align-items:center;gap:4px;">
+                  <button class="trip-card-del-btn" @click="shareTrip(trip.id)" :title="trip.shareId ? '共有中（リンクを表示）' : '共有リンクを作成'" :style="trip.shareId ? 'color:#5b8dee;' : ''">🔗</button>
                   <button class="trip-card-del-btn" @click="deleteTrip(trip.id)">🗑️</button>
                 </div>
               </div>
@@ -303,6 +306,21 @@
         <div class="modal-actions">
           <button class="btn btn-cancel" @click="showNewTripModal=false">キャンセル</button>
           <button class="btn btn-primary" @click="createTrip()">作成する</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- 共有モーダル -->
+  <template x-if="showShareModal">
+    <div class="modal-overlay" @click.self="showShareModal=false">
+      <div class="modal fade-in">
+        <h3>🔗 旅行を共有</h3>
+        <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:12px;">このURLを相手（LINEなど）に送ってください。<br>開くと自動でデータが同期されます。</p>
+        <div style="background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:10px 12px;word-break:break-all;font-size:0.78rem;color:var(--gray-700);margin-bottom:16px;line-height:1.6;" x-text="shareUrl"></div>
+        <div class="modal-actions">
+          <button class="btn btn-cancel" @click="showShareModal=false">閉じる</button>
+          <button class="btn btn-primary" @click="copyShareUrl()">📋 URLをコピー</button>
         </div>
       </div>
     </div>
@@ -770,11 +788,31 @@
    *  - 全データ LocalStorage 保存
    * ===================================================
    */
+  // ==============================
+  // Firebase 初期化
+  // ==============================
+  const _fbApp = firebase.initializeApp({
+    apiKey: "AIzaSyAnYuMJ1RHIZjZmNq6ht5Tfz0f0-2RKuwU",
+    authDomain: "travel-app-802ed.firebaseapp.com",
+    databaseURL: "https://travel-app-802ed-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "travel-app-802ed",
+    storageBucket: "travel-app-802ed.firebasestorage.app",
+    messagingSenderId: "161214331047",
+    appId: "1:161214331047:web:54b5329c2c75283fae0382"
+  });
+  const _fbDB = firebase.database();
+
   function travelApp() {
     return {
       // ---- 旅行一覧 ----
       trips: [],
       currentTripId: null,
+
+      // ---- 共有 ----
+      showShareModal: false,
+      shareModalTripId: null,
+      shareUrl: '',
+      _fbListeners: {},
 
       // ---- 新規旅行モーダル ----
       showNewTripModal: false,
@@ -833,6 +871,12 @@
           this.trips = [];
         }
 
+        // URLの?share=パラメータを処理（非同期）
+        const _shareParam = new URLSearchParams(window.location.search).get('share');
+        if (_shareParam) {
+          this._loadSharedTrip(_shareParam);
+        }
+
         // ==============================
         // 大阪旅行 (2026,5) プリセットデータ
         // スプレッドシートから読み込み済み
@@ -885,11 +929,24 @@
         }
       },
 
-      /** LocalStorageへ保存する */
+      /** LocalStorageへ保存する + Firebase同期 */
       save() {
+        // 現在の旅行のupdatedAtを更新（同期ループ防止用）
+        if (this.currentTripId) {
+          const t = this.trips.find(t => t.id === this.currentTripId);
+          if (t) t.updatedAt = Date.now();
+        }
         try {
           localStorage.setItem('travelApp_v2', JSON.stringify({ trips: this.trips }));
         } catch(e) { console.warn('保存エラー', e); }
+        // Firebase同期
+        if (this.currentTripId) {
+          const trip = this.trips.find(t => t.id === this.currentTripId);
+          if (trip && trip.shareId) {
+            _fbDB.ref('shared/' + trip.shareId).set(trip)
+              .catch(e => console.warn('Firebase保存エラー', e));
+          }
+        }
       },
 
       /** ユニークID生成 */
@@ -923,12 +980,17 @@
       },
 
       openTrip(id) {
+        this._detachFbListener();
         this.currentTripId=id; this.activeTab='schedule';
         this.resetAllForms();
         window.scrollTo({top:0});
+        // 共有旅行ならFirebaseリスナーを設定
+        const trip = this.trips.find(t => t.id === id);
+        if (trip && trip.shareId) this._attachFbListener(id, trip.shareId);
       },
 
       closeTrip() {
+        this._detachFbListener();
         this.currentTripId=null;
         this.resetAllForms();
         window.scrollTo({top:0});
@@ -940,6 +1002,93 @@
         if (!confirm(`「${trip.name||'無題の旅行'}」を削除しますか？\nこの操作は取り消せません。`)) return;
         this.trips = this.trips.filter(t=>t.id!==id);
         this.save();
+      },
+
+      // ==============================
+      // Firebase リアルタイム同期
+      // ==============================
+
+      _attachFbListener(tripId, shareId) {
+        const dbRef = _fbDB.ref('shared/' + shareId);
+        dbRef.on('value', (snap) => {
+          if (!snap.exists()) return;
+          const remote = snap.val();
+          const idx = this.trips.findIndex(t => t.id === tripId);
+          if (idx === -1) return;
+          const local = this.trips[idx];
+          // リモートが新しい場合のみ反映（ループ防止）
+          if (!local.updatedAt || (remote.updatedAt && remote.updatedAt > local.updatedAt)) {
+            this.trips[idx] = remote;
+            try { localStorage.setItem('travelApp_v2', JSON.stringify({ trips: this.trips })); } catch(e) {}
+          }
+        });
+        this._fbListeners[tripId] = () => dbRef.off('value');
+      },
+
+      _detachFbListener() {
+        if (this.currentTripId && this._fbListeners[this.currentTripId]) {
+          this._fbListeners[this.currentTripId]();
+          delete this._fbListeners[this.currentTripId];
+        }
+      },
+
+      // ==============================
+      // 共有機能
+      // ==============================
+
+      /** 共有リンクを生成してモーダル表示 */
+      shareTrip(tripId) {
+        const trip = this.trips.find(t => t.id === tripId);
+        if (!trip) return;
+        if (!trip.shareId) {
+          trip.shareId = this.uid();
+          // 共有開始時は即座にFirebaseへ書き込む（currentTripIdなしでも動くよう直接呼ぶ）
+          _fbDB.ref('shared/' + trip.shareId).set(trip)
+            .catch(e => console.warn('Firebase共有開始エラー', e));
+          try { localStorage.setItem('travelApp_v2', JSON.stringify({ trips: this.trips })); } catch(e) {}
+        }
+        this.shareModalTripId = tripId;
+        this.shareUrl = location.origin + location.pathname + '?share=' + trip.shareId;
+        this.showShareModal = true;
+      },
+
+      /** 共有URLをクリップボードにコピー */
+      copyShareUrl() {
+        navigator.clipboard.writeText(this.shareUrl)
+          .then(() => alert('URLをコピーしました！\nLINEなどで相手に送ってください。'))
+          .catch(() => {
+            // フォールバック
+            const el = document.createElement('textarea');
+            el.value = this.shareUrl;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert('URLをコピーしました！');
+          });
+      },
+
+      /** ?share=XXX から旅行を読み込む */
+      async _loadSharedTrip(shareId) {
+        try {
+          const snap = await _fbDB.ref('shared/' + shareId).once('value');
+          if (!snap.exists()) {
+            alert('共有データが見つかりません。URLを確認してください。');
+            return;
+          }
+          const remote = snap.val();
+          const existIdx = this.trips.findIndex(t => t.shareId === shareId || t.id === remote.id);
+          if (existIdx === -1) {
+            this.trips.unshift(remote);
+          } else {
+            this.trips[existIdx] = remote;
+          }
+          try { localStorage.setItem('travelApp_v2', JSON.stringify({ trips: this.trips })); } catch(e) {}
+          this.openTrip(remote.id);
+        } catch(e) {
+          console.error('共有データ読み込みエラー', e);
+          alert('共有データの読み込みに失敗しました。');
+        }
       },
 
       /** 現在の旅行オブジェクトを返す */
