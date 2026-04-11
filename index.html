@@ -714,7 +714,7 @@
                 <tbody>
                   <template x-for="item in sortedBudgets()" :key="item.id">
                     <tr :style="budgetRowStyle(item.category)">
-                      <td style="white-space:nowrap;" x-text="item.date?formatDate(item.date):'—'"></td>
+                      <td style="white-space:nowrap;font-size:0.78rem;" x-text="budgetDateLabel(item)"></td>
                       <td style="font-weight:600;" x-text="item.title||'—'"></td>
                       <td><span class="badge" :class="categoryBadge(item.category)" x-text="item.category"></span></td>
                       <td style="text-align:right;font-weight:700;white-space:nowrap;" x-text="item.amount>0?'¥'+formatNum(item.amount):'—'"></td>
@@ -1472,7 +1472,32 @@
         this.editingBudgetId=null; this.showBudgetForm=false;
       },
       sortedBudgets() {
-        return (this.currentTrip().budgets||[]).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+        const trip = this.currentTrip();
+        // scheduleId → schedule をマップ化（O(1) 検索）
+        const schedMap = {};
+        (trip.schedules||[]).forEach(s => { schedMap[s.id] = s; });
+
+        return (trip.budgets||[]).slice().sort((a, b) => {
+          const sA = a.scheduleId ? schedMap[a.scheduleId] : null;
+          const sB = b.scheduleId ? schedMap[b.scheduleId] : null;
+          // 日付: スケジュール紐づきがあればそちらを優先、未設定は最後
+          const dateA = (sA ? sA.date : a.date) || '\uffff';
+          const dateB = (sB ? sB.date : b.date) || '\uffff';
+          if (dateA !== dateB) return dateA < dateB ? -1 : 1;
+          // 同日: スケジュールの startTime 順、未設定は最後
+          const timeA = (sA && sA.startTime) || '\uffff';
+          const timeB = (sB && sB.startTime) || '\uffff';
+          return timeA < timeB ? -1 : timeA > timeB ? 1 : 0;
+        });
+      },
+
+      /** 予算テーブルの日付セル用（スケジュール紐づき時は時間も表示） */
+      budgetDateLabel(item) {
+        const trip = this.currentTrip();
+        const sched = item.scheduleId ? (trip.schedules||[]).find(s => s.id === item.scheduleId) : null;
+        const date = sched ? sched.date : item.date;
+        const time = sched ? sched.startTime : '';
+        return (date ? this.formatDate(date) : '—') + (time ? ' ' + time : '');
       },
 
       // ==============================
