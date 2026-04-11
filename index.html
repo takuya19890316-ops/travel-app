@@ -1108,8 +1108,12 @@
           if (idx === -1) return;
           const local = this.trips[idx];
           // リモートが新しい場合のみ反映（ループ防止）
-          if (!local.updatedAt || (remote.updatedAt && remote.updatedAt > local.updatedAt)) {
-            this.trips[idx] = remote;
+          // updatedAt が片方にない場合は更新を優先する
+          const remoteNewer = remote.updatedAt && local.updatedAt
+            ? remote.updatedAt > local.updatedAt
+            : remote.updatedAt !== local.updatedAt;
+          if (remoteNewer) {
+            this.trips.splice(idx, 1, remote); // splice で Alpine リアクティビティを確実に発火
             try { localStorage.setItem('travelApp_v2', JSON.stringify({ trips: this.trips })); } catch(e) {}
           }
         });
@@ -1133,7 +1137,7 @@
         if (!trip) return;
         if (!trip.shareId) {
           trip.shareId = this.uid();
-          // 共有開始時は即座にFirebaseへ書き込む（currentTripIdなしでも動くよう直接呼ぶ）
+          trip.updatedAt = Date.now(); // updatedAt を設定してから書き込む（iPhone側の比較に必要）
           _fbDB.ref('shared/' + trip.shareId).set(trip)
             .catch(e => console.warn('Firebase共有開始エラー', e));
           try { localStorage.setItem('travelApp_v2', JSON.stringify({ trips: this.trips })); } catch(e) {}
@@ -1172,7 +1176,7 @@
           if (existIdx === -1) {
             this.trips.unshift(remote);
           } else {
-            this.trips[existIdx] = remote;
+            this.trips.splice(existIdx, 1, remote); // splice で Alpine リアクティビティを確実に発火
           }
           try { localStorage.setItem('travelApp_v2', JSON.stringify({ trips: this.trips })); } catch(e) {}
           this.openTrip(remote.id);
